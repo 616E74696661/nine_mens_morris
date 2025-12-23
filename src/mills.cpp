@@ -1,7 +1,3 @@
-#ifndef MILLS_CLASS_HPP
-#define MILLS_CLASS_HPP
-
-#include "constants/error_messages.hpp"
 #include "constants/game_text.hpp"
 #include <iostream>
 
@@ -9,71 +5,79 @@ class Mills {
 public:
   Mills() { start_game(); }
 
-  void field_output() {
-    for (int i = 0; i < Y; i++) {
-      if (i % 2 == 0 && i != Y - 1)
-        std::cout << 7 - (i / 2) << "  ";
+  void ouput_field() {
+    int pos_count = 0;
+    for (int i = 0; i < 13; i++) {
+      // only every 2 rows are numerated
+      if (i % 2 == 0)
+        std::cout << 7 - (i / 2) << "   ";
       else
-        std::cout << "   ";
-      std::cout << field_template[i] << std::endl;
+        std::cout << "    ";
+      for (int j = 0; j < 26; j++) {
+        if (FIELD_TEMPLATE[i][j] == '#') {
+          // get field content
+          int pos_y = std::get<0>(VALID_POSITIONS[pos_count]);
+          int pos_x = std::get<1>(VALID_POSITIONS[pos_count++]);
+          std::cout << mills_field[pos_y][pos_x];
+        } else
+          std::cout << FIELD_TEMPLATE[i][j];
+      }
+      std::cout << std::endl;
     }
+    std::cout << "\n    " << "1   2   3   4   5   6   7" << std::endl;
   }
 
-  int player_set_stone(int player, int pos_y, int pos_x) {
-    pos_y = get_y_pos(pos_y);
-    pos_x = get_x_pos(pos_x);
-    printf("y: %i, x: %i\n", pos_y, pos_x);
-    if (!(pos_y < Y && pos_x < X) || field_template[pos_y][pos_x] != '#') {
+  int set_stone(int player, int pos_x, int pos_y) {
+    pos_x = calc_x_pos(pos_x);
+    pos_y = calc_y_pos(pos_y);
+
+    // return if invalid input
+    if (!valid_input(pos_x, pos_y)) {
       std::cout << game_text::INVALID_INPUT << std::endl;
       return 0;
     }
-    field_template[pos_y][pos_x] = player == 0 ? 'O' : 'X';
-    std::cout << "successfully set :3" << std::endl;
+
+    mills_field[pos_y][pos_x] = player == 0 ? 'O' : 'X';
+
+    std::cout << "successfully set stone" << std::endl;
     return 1;
   }
 
 private:
-  static const int X = 26;
-  static const int Y = 15;
   static const int STONES = 24;
-  static const char T = '#';
+  static const char T = ' ';
 
-  // int mills_field[STONES];
+  const std::pair<int, int> VALID_POSITIONS[STONES] = {
+      {0, 0}, {0, 3}, {0, 6}, {1, 1}, {1, 3}, {1, 5}, {2, 2}, {2, 3},
+      {2, 4}, {3, 0}, {3, 1}, {3, 2}, {3, 4}, {3, 5}, {3, 6}, {4, 2},
+      {4, 3}, {4, 4}, {5, 1}, {5, 3}, {5, 5}, {6, 0}, {6, 3}, {6, 6}};
 
-  char field_template[Y][X] = {
+  const char FIELD_TEMPLATE[15][26] = {
       "#-----------#-----------#", "|           |           |",
       "|   #-------#-------#   |", "|   |       |       |   |",
       "|   |   #---#---#   |   |", "|   |   |       |   |   |",
       "#---#---#       #---#---#", "|   |   |       |   |   |",
       "|   |   #---#---#   |   |", "|   |       |       |   |",
       "|   #-------#-------#   |", "|           |           |",
-      "#-----------#-----------#", "",
-      "1   2   3   4   5   6   7"};
+      "#-----------#-----------#",
+  };
 
-  // irrelevant when saving as [7][7] arr
-  int get_y_pos(int pos_y) { return ((7 - (pos_y)) * 2); }
+  char mills_field[7][7] = {
+      {T, '\0', '\0', T, '\0', '\0', T}, {'\0', T, '\0', T, '\0', T, '\0'},
+      {'\0', '\0', T, T, T, '\0', '\0'}, {T, T, T, '\0', T, T, T},
+      {'\0', '\0', T, T, T, '\0', '\0'}, {'\0', T, '\0', T, '\0', T, '\0'},
+      {T, '\0', '\0', T, '\0', '\0', T}};
 
-  // irrelevant when saving as [7][7] arr
-  int get_x_pos(int pos_x) { return ((pos_x - 1) * 4); }
+  int calc_y_pos(int pos_y) { return (7 - (pos_y)); }
+
+  int calc_x_pos(int pos_x) { return pos_x - 1; }
 
   int start_game() {
     std::cout << std::endl << game_text::START << std::endl << std::endl;
-    // settings();
     return 1;
   }
 
-  /*int settings() {
-    std::cout << game_text::SETTINGS << std::endl << std::endl;
-    return 1;
-  }*/
-
-  /*int create_field() {
-    return 1;
-  }*/
-
-  // irrelevant when saving as [7][7] arr
-  int calc_pos(int pos_y, int pos_x) {
-    return get_y_pos(pos_y) + get_x_pos(pos_x);
+  int valid_input(int pos_x, int pos_y) {
+    return (pos_x < 7 && pos_y < 7 && mills_field[pos_y][pos_x] == T);
   }
 };
-#endif
