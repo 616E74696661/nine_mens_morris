@@ -4,6 +4,7 @@
 #include "constants/error_messages.hpp"
 #include "constants/game_text.hpp"
 #include <iostream>
+#include "position.cpp"
 
 class Mills {
 public:
@@ -19,9 +20,10 @@ public:
     }
   }
 
-  int player_set_stone(int player, int pos_y, int pos_x) {
-    pos_y = get_y_pos(pos_y);
-    pos_x = get_x_pos(pos_x);
+  int player_set_stone(int player, position* pos) {
+    int pos_y = pos->y;
+    int pos_x = pos->x;
+
     printf("y: %i, x: %i\n", pos_y, pos_x);
     if (!(pos_y < Y && pos_x < X) || field_template[pos_y][pos_x] != '#') {
       std::cout << game_text::INVALID_INPUT << std::endl;

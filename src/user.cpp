@@ -1,49 +1,35 @@
+#ifndef USER_CLASS_HPP
+#define USER_CLASS_HPP
+
+#include <string>
+#include <iostream>
 #include "constants/error_messages.hpp"
 #include "constants/game_text.hpp"
-#include "iostream";
 
-static int number = 0;
+static int num_players = 0;
 
-struct position {
+class user {
     private:
-        int x;
-        int y;
-    public:
-        position(int xPos, int yPos) {
-            x = xPos;
-            y = yPos;
+        void defineMarker() {
+            if (num_players == 1) {
+                this->marker = 'O';
+            } else if (num_players == 2) {
+                this->marker = 'X';
+            } else {
+                throw error_msg::TOO_MANY_PLAYERS;
+            }
         }
-        
+    protected:
+        virtual ~user() = default;
+    public:
+        char marker;
+        std::string name;
+        user (std::string name) : name(name) {
+            num_players++;
+            defineMarker();
+        }
+        virtual void place_marker(Mills* m) {
+        }
 };
 
-
-typedef struct user_t {
-    private:
-        char marker;
-        void set_marker() {
-            if (number == 0) {
-                marker = 'O';
-            } else if (marker == 1){
-                marker = 'X';
-            } else {
-                throw error_msg::TOO_MANY_PLAYERS_ERROR;
-            }
-            number++;
-        }
-    public:
-        user_t() {
-            set_marker();
-        }
-
-        void make_move() {
-            std::cout << "It's your turn Player 1:" << std::endl;
-            std::cout << "Select marker:" << std::endl;
-            
-        }
-
-        void place_marker() {
-
-        }
-
-        
-} user;
+#endif

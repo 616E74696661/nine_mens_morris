@@ -3,6 +3,9 @@
 
 #include <string>
 namespace game_text {
+static const std::string WELCOME = "Welcome to Mühle!";
+static const std::string GAME_MODE = "Please select a game mode: \r\n1. Player vs Player\r\n2. Player vs Bot";
+
 static const std::string WIN = "you won! :)";
 static const std::string LOSE = "you lost! :(";
 static const std::string START = "welcome to nine men's morris!";
