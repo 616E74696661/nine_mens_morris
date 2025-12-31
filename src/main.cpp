@@ -1,6 +1,11 @@
 #include "mills.cpp"
+#include "settings.cpp"
 
 int main() {
+
+  Settings setting;
+  setting.setup();
+
   Mills m;
   m.field_output();
 
