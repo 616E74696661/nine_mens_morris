@@ -1,16 +1,16 @@
 #include "mills.cpp"
 #include "settings.cpp"
+#include "constants/error_messages.hpp"
 
 int main() {
-
+  std::cout << game_text::WELCOME << std::endl;
+  
   Settings setting;
   std::vector<user*> players = setting.setup();
 
   Mills m;
   m.field_output();
 
-  int pos_y;
-  int pos_x;
   user* active_player = players.at(0);
 
   for (int i = 0; i < 10; i++) {

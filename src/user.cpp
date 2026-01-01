@@ -5,6 +5,7 @@
 #include <iostream>
 #include "constants/error_messages.hpp"
 #include "constants/game_text.hpp"
+#include "mills.cpp"
 
 static int num_players = 0;
 

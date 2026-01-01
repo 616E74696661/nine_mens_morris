@@ -1,6 +1,6 @@
-#include "position.cpp"
-#include "user.cpp"
+#include "position.hpp"
 #include "mills.cpp"
+#include "user.cpp"
 #include <iostream>
 #include <string>
 
@@ -16,13 +16,13 @@ public:
         
         int pos_y;
         int pos_x;
-        std::cout << "y: ";
-        std::cin >> pos_y;
-        std::cout << "x: ";
-        std::cin >> pos_x;
 
         try {   
-            position pos(pos_x, pos_y);
+            std::cout << "y: ";
+            std::cin >> pos_y;
+            std::cout << "x: ";
+            std::cin >> pos_x;
+            Position pos(pos_x, pos_y);
             m->player_set_stone(marker, &pos);
         }
         catch (const std::string& e) {

@@ -17,7 +17,6 @@ enum GameMode {
 class Settings {
 public:
     std::vector<user*> setup() {
-        std::cout << game_text::WELCOME << std::endl;
         std::cout << game_text::GAME_MODE << std::endl;
         int mode;
         std::cin >> mode;
@@ -25,7 +24,7 @@ public:
             std::cout << "Player vs Player mode selected." << std::endl;
 
             std::vector<user*> players;
-            players.push_back(new player_user("Player 1"));
+            players.push_back(new player_user("Player 1")); 
             players.push_back(new player_user("Player 2"));
             return players;
 
