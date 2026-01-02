@@ -40,5 +40,5 @@
 # debug information files
 *.dwo
 
-# vscode settings
-/.vscode
+# vscode settings folder
+.vscode
