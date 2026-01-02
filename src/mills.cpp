@@ -32,6 +32,21 @@ public:
     std::cout << "successfully set :3" << std::endl;
     return 1;
   }
+  
+  bool check_mill(std::array<std::pair<int, int>, 3> mill, char marker) {
+
+    int counter = 0;
+
+    for (const auto &pos : mill) {
+      int pos_y = get_y_pos(pos.second);
+      int pos_x = get_x_pos(pos.first);
+      if (field_template[pos_y][pos_x] == marker) {
+        counter++;
+      }
+    }
+
+    return counter == 3;
+  }
 
 private:
   static const int X = 26;
