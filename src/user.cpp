@@ -29,7 +29,8 @@ class user {
             num_players++;
             defineMarker();
         }
-        virtual void place_marker(Mills* m) {
+        virtual Position place_marker() {
+            return Position(0, 0);
         }
 };
 

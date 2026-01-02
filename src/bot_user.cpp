@@ -6,8 +6,9 @@ public:
 
     }
 
-    void place_marker(Mills* m) override {
+    Position place_marker() override {
         std::cout << "Bot " << this->name << " is placing a marker." << std::endl;
         // Simple bot logic: place marker at the first available position      
+        return Position(0, 0);
     }
 };

@@ -10,7 +10,7 @@ public:
 
     }
 
-    void place_marker(Mills* m) override {
+    Position place_marker() override {
         std::cout << "It's your turn, " << this->name << "!" << std::endl;
         std::cout << "Select marker position:" << std::endl;
         
@@ -23,12 +23,12 @@ public:
             std::cout << "x: ";
             std::cin >> pos_x;
             Position pos(pos_x, pos_y);
-            m->player_set_stone(marker, &pos);
+            return pos;
         }
         catch (const std::string& e) {
             std::cout << e << std::endl;
-            place_marker(m); // Retry placing marker
-            return;
+            // Retry placing marker
+            return place_marker();
         }
     }
 };
