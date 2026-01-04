@@ -5,10 +5,11 @@
 #include "constants/game_text.hpp"
 #include "position.hpp"
 #include <iostream>
+#include <stdexcept>
 
 class Mills {
 public:
-  Mills() { }
+  Mills() {}
 
   void field_output() {
     for (int i = 0; i < Y; i++) {
@@ -25,19 +26,20 @@ public:
     int pos_x = get_x_pos(pos->x);
 
     if (field_template[pos_y][pos_x] != T) {
-      throw error_msg::POSITION_OCCUPIED;
+      std::cout << error_msg::POSITION_OCCUPIED << std::endl;
+      return 0;
     }
 
     field_template[pos_y][pos_x] = marker;
     std::cout << "successfully set :3" << std::endl;
     return 1;
   }
-  
+
   bool check_mill(std::array<std::pair<int, int>, 3> mill, char marker) {
 
     int counter = 0;
 
-    for (const auto &pos : mill) {
+    for (const auto& pos : mill) {
       int pos_y = get_y_pos(pos.second);
       int pos_x = get_x_pos(pos.first);
       if (field_template[pos_y][pos_x] == marker) {
@@ -55,21 +57,21 @@ private:
   static const char T = '#';
 
   // int mills_field[STONES];
-
   char field_template[Y][X] = {
-      "#-----------#-----------#", 
+      "#-----------#-----------#",
       "|           |           |",
-      "|   #-------#-------#   |", 
+      "|   #-------#-------#   |",
       "|   |       |       |   |",
-      "|   |   #---#---#   |   |", 
+      "|   |   #---#---#   |   |",
       "|   |   |       |   |   |",
-      "#---#---#       #---#---#", 
+      "#---#---#       #---#---#",
       "|   |   |       |   |   |",
-      "|   |   #---#---#   |   |", 
+      "|   |   #---#---#   |   |",
       "|   |       |       |   |",
-      "|   #-------#-------#   |", 
+      "|   #-------#-------#   |",
       "|           |           |",
-      "#-----------#-----------#", "",
+      "#-----------#-----------#",
+      "",
       "1   2   3   4   5   6   7"};
 
   int get_y_pos(int pos_y) { return ((7 - (pos_y)) * 2); }
@@ -81,6 +83,5 @@ private:
   int calc_pos(int pos_y, int pos_x) {
     return get_y_pos(pos_y) + get_x_pos(pos_x);
   }
-
 };
 #endif
