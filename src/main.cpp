@@ -4,15 +4,16 @@
 #include <iostream>
 #include <vector>
 
-void handle_mill();
-void handle_opening();
-void handle_midgame();
-void handle_endgame();
+void handle_mill(Mills*, Position*, char);
+Position handle_opening();
+Position handle_midgame();
+Position handle_endgame();
 
 Settings setting;
 std::vector<user*> players = setting.setup();
 
 Mills m;
+Position pos;
 
 user* active_player = players.at(0);
 
@@ -23,22 +24,21 @@ int main() {
   // Gameloop
   bool run = true;
   while (run) {
-
-    m.field_output();
-
     switch (m.get_current_phase()) {
     case Mills::OPENING:
-      handle_opening();
+      pos = handle_opening();
       break;
     case Mills::MIDGAME:
-      handle_midgame();
+      pos = handle_midgame();
       break;
     case Mills::ENDGAME:
-      handle_endgame();
+      pos = handle_endgame();
       break;
     default:
+      return 0;
       break;
     }
+
     // check for mills
     handle_mill(&m, &pos, active_player->marker);
     // switch active player
@@ -47,30 +47,59 @@ int main() {
   }
 }
 
-void handle_opening() {
+Position handle_opening() {
+  m.field_output();
   // Set stone position
   Position pos = active_player->place_marker();
 
+  std::cout << pos.y << " " << pos.x << std::endl;
   bool success = m.player_set_stone(active_player->marker, &pos);
   if (!success) {
     // Retry placing marker
-    handle_opening();
-    return;
+    return handle_opening();
   }
 
   if (m.all_stones_set())
     m.next_phase();
+
+  return pos;
 }
 
-void handle_midgame() {
+// works (but is not pretty)
+// need to test this more and add error handling
+Position handle_midgame() {
+  m.field_output();
+  // TODO: check if player can make a move (if not -> instantly lost)
+  std::pair<Position, Position> move_marker = active_player->move_marker();
+  Position old_pos = move_marker.first;
+  Position new_pos = move_marker.second;
+
+  std::cout << old_pos.y << " " << old_pos.x << std::endl;
+
+  bool success = m.player_remove_stone(active_player->marker, &old_pos);
+  if (!success) {
+    // Retry placing marker
+    return handle_midgame();
+  }
+
+  success = m.player_set_stone(active_player->marker, &new_pos);
+  if (!success) {
+    m.player_set_stone(active_player->marker, &old_pos);
+    // Retry placing marker
+    return handle_midgame();
+  }
+  return move_marker.second;
 }
 
-void handle_endgame() {
+Position handle_endgame() {
+  m.field_output();
+  // Position pos = active_player->move_marker();
+  return Position();
 }
 
 void handle_mill(Mills* m, Position* pos, char marker) {
   std::vector<std::array<std::pair<int, int>, 3>> mills =
-      pos->getPossibleMills();
+      pos->get_possible_mills();
   for (const auto& mill : mills) {
     if (m->check_mill(mill, marker)) {
       std::cout << "Mill formed!" << std::endl;

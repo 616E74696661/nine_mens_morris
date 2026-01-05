@@ -15,9 +15,7 @@ enum GameMode {
 class Settings {
 public:
   std::vector<user*> setup() {
-    std::cout << game_text::GAME_MODE << std::endl;
-    int mode;
-    std::cin >> mode;
+    int mode = read_int(game_text::GAME_MODE);
     if (mode == PLAYER_VS_PLAYER) {
       std::cout << "Player vs Player mode selected." << std::endl;
 

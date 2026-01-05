@@ -9,7 +9,7 @@ static int num_players = 0;
 
 class user {
 private:
-  void defineMarker() {
+  void define_marker() {
     if (num_players == 1) {
       this->marker = 'O';
     } else if (num_players == 2) {
@@ -27,18 +27,18 @@ public:
   std::string name;
   user(std::string name) : name(name) {
     num_players++;
-    defineMarker();
+    define_marker();
   }
   virtual Position place_marker() {
-    return Position(0, 0);
+    return Position();
   }
 
-  virtual void move_marker() {
-    // TODO
+  virtual std::pair<Position, Position> move_marker() {
+    return std::make_pair(Position(), Position());
   }
 
-  virtual void remove_opponent_marker() {
-    // TODO
+  virtual std::pair<Position, Position> remove_opponent_marker() {
+    return std::make_pair(Position(), Position());
   }
 };
 
