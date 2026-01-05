@@ -9,7 +9,16 @@
 
 class Mills {
 public:
-  Mills() {}
+  Mills() {
+    current_phase = OPENING;
+    stones_set = 0;
+  }
+
+  enum GamePhase {
+    OPENING = 0,
+    MIDGAME = 1,
+    ENDGAME = 2
+  };
 
   void field_output() {
     for (int i = 0; i < Y; i++) {
@@ -20,8 +29,24 @@ public:
       std::cout << field_template[i] << std::endl;
     }
   }
+  void stone_set() {
+    stones_set++;
+  }
 
-  int player_set_stone(char marker, Position* pos) {
+  int all_stones_set() {
+    return stones_set == STONES;
+  }
+
+  GamePhase get_current_phase() {
+    return current_phase;
+  }
+
+  void next_phase() {
+    if (current_phase < ENDGAME)
+      current_phase = static_cast<GamePhase>(static_cast<int>(current_phase) + 1);
+  }
+
+  bool player_set_stone(char marker, Position* pos) {
     int pos_y = get_y_pos(pos->y);
     int pos_x = get_x_pos(pos->x);
 
@@ -55,6 +80,8 @@ private:
   static const int Y = 15;
   static const int STONES = 24;
   static const char T = '#';
+  GamePhase current_phase;
+  int stones_set;
 
   // int mills_field[STONES];
   char field_template[Y][X] = {
