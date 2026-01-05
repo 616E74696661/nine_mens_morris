@@ -6,6 +6,7 @@
 #include "position.hpp"
 #include <iostream>
 #include <stdexcept>
+#include <string>
 
 class Mills {
 public:
@@ -52,12 +53,12 @@ public:
 
     if (field_template[pos_y][pos_x] != T) {
       std::cout << error_msg::POSITION_OCCUPIED << std::endl;
-      return 0;
+      return false;
     }
 
     field_template[pos_y][pos_x] = marker;
     std::cout << "successfully set :3" << std::endl;
-    return 1;
+    return true;
   }
 
   bool check_mill(std::array<std::pair<int, int>, 3> mill, char marker) {

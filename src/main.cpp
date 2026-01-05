@@ -1,6 +1,8 @@
-#include "constants/error_messages.hpp"
 #include "mills.cpp"
 #include "settings.cpp"
+#include <array>
+#include <iostream>
+#include <vector>
 
 void handle_mills(Mills* m, Position* pos, char marker) {
   std::vector<std::array<std::pair<int, int>, 3>> mills =
@@ -13,35 +15,36 @@ void handle_mills(Mills* m, Position* pos, char marker) {
   }
 }
 
+void handle_opening();
+void handle_midgame();
+void handle_endgame();
+
+Settings setting;
+std::vector<user*> players = setting.setup();
+
+Mills m;
+
+user* active_player = players.at(0);
+
 int main() {
   std::cout << game_text::WELCOME << std::endl;
 
-  Settings setting;
-  std::vector<user*> players = setting.setup();
-
-  Mills m;
-
-  user* active_player = players.at(0);
   int i = 0;
   // Gameloop
   bool run = true;
   while (run) {
 
     m.field_output();
-    // Select position
-    Position pos = active_player->place_marker();
 
     switch (m.get_current_phase()) {
     case Mills::OPENING:
-      // invalid stone placed
-      if (!m.player_set_stone(active_player->marker, &pos))
-        continue;
-      if (m.all_stones_set())
-        m.next_phase();
+      handle_opening();
       break;
     case Mills::MIDGAME:
+      handle_midgame();
       break;
     case Mills::ENDGAME:
+      handle_endgame();
       break;
     default:
       break;
@@ -52,4 +55,22 @@ int main() {
     active_player =
         players.at((++i) % 2);
   }
+}
+
+void handle_opening() {
+  // Set stone position
+  Position pos = active_player->place_marker();
+
+  bool success = m.player_set_stone(active_player->marker, &pos);
+  if (!success) {
+    // Retry placing marker
+    handle_opening();
+    return;
+  }
+
+  if (m.all_stones_set())
+    m.next_phase();
+}
+
+void handle_midgame() {
 }
