@@ -1,9 +1,7 @@
-#include "mills.cpp"
 #include "position.hpp"
-#include "user.cpp"
+#include "user.hpp"
 #include <iostream>
 #include <string>
-
 
 class player_user : public user {
 public:

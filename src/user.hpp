@@ -2,9 +2,7 @@
 #define USER_CLASS_HPP
 
 #include "constants/error_messages.hpp"
-#include "constants/game_text.hpp"
-#include "mills.cpp"
-#include <iostream>
+#include "position.hpp"
 #include <string>
 
 static int num_players = 0;
@@ -36,9 +34,11 @@ public:
   }
 
   virtual void move_marker() {
+    // TODO
   }
 
   virtual void remove_opponent_marker() {
+    // TODO
   }
 };
 

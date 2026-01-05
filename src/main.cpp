@@ -1,20 +1,10 @@
-#include "mills.cpp"
+#include "mills.hpp"
 #include "settings.cpp"
 #include <array>
 #include <iostream>
 #include <vector>
 
-void handle_mills(Mills* m, Position* pos, char marker) {
-  std::vector<std::array<std::pair<int, int>, 3>> mills =
-      pos->getPossibleMills();
-  for (const auto& mill : mills) {
-    if (m->check_mill(mill, marker)) {
-      std::cout << "Mill formed!" << std::endl;
-      // TODO: handle removing opponent's piece
-    }
-  }
-}
-
+void handle_mill();
 void handle_opening();
 void handle_midgame();
 void handle_endgame();
@@ -50,7 +40,7 @@ int main() {
       break;
     }
     // check for mills
-    handle_mills(&m, &pos, active_player->marker);
+    handle_mill(&m, &pos, active_player->marker);
     // switch active player
     active_player =
         players.at((++i) % 2);
@@ -73,4 +63,18 @@ void handle_opening() {
 }
 
 void handle_midgame() {
+}
+
+void handle_endgame() {
+}
+
+void handle_mill(Mills* m, Position* pos, char marker) {
+  std::vector<std::array<std::pair<int, int>, 3>> mills =
+      pos->getPossibleMills();
+  for (const auto& mill : mills) {
+    if (m->check_mill(mill, marker)) {
+      std::cout << "Mill formed!" << std::endl;
+      // TODO: handle removing opponent's piece
+    }
+  }
 }
