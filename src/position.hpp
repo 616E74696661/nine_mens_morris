@@ -4,8 +4,7 @@
 #include "constants/error_messages.hpp"
 #include <algorithm>
 #include <array>
-#include <iostream>
-#include <ostream>
+#include <random>
 #include <vector>
 
 static std::array<std::pair<int, int>, 24> valid_positions{
@@ -95,6 +94,8 @@ public:
     x = x_pos, y = y_pos;
   }
 
+  virtual ~Position() = default;
+
   bool is_valid(int x_pos, int y_pos) {
     for (const auto& p : valid_positions) {
       if (p.first == x_pos && p.second == y_pos) {
@@ -140,5 +141,19 @@ public:
     return mills;
   }
 };
+
+struct Invalid_Position : Position {
+  Invalid_Position() : Position() {}
+};
+
+static Position get_random_position() {
+  std::random_device rd;
+  std::mt19937 gen(rd());
+  std::uniform_int_distribution<> dist(0, 23);
+
+  int randomNumber = dist(gen);
+  return Position(valid_positions[randomNumber].first,
+                  valid_positions[randomNumber].second);
+}
 
 #endif // POSITION_HPP

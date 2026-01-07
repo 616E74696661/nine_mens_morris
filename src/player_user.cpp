@@ -10,7 +10,7 @@ public:
   player_user(std::string name) : user(name) {
   }
 
-  Position place_marker() override {
+  Position place_marker(Mills* m) override {
     std::cout << "It's your turn, " << this->name << "!" << std::endl;
     std::cout << "Select stone position:" << std::endl;
 
@@ -25,7 +25,7 @@ public:
     } catch (const std::string& e) {
       std::cout << e << std::endl;
       // Retry placing marker
-      return place_marker();
+      return place_marker(m);
     }
   }
 

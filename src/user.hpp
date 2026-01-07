@@ -1,9 +1,11 @@
 #ifndef USER_CLASS_HPP
 #define USER_CLASS_HPP
 
+#include "Mills.hpp"
 #include "constants/error_messages.hpp"
 #include "position.hpp"
 #include <string>
+
 
 static int num_players = 0;
 
@@ -29,7 +31,7 @@ public:
     num_players++;
     define_marker();
   }
-  virtual Position place_marker() {
+  virtual Position place_marker(Mills* m) {
     return Position();
   }
 

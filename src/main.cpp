@@ -1,4 +1,4 @@
-#include "mills.hpp"
+#include "Mills.hpp"
 #include "settings.cpp"
 #include <array>
 #include <iostream>
@@ -50,7 +50,7 @@ int main() {
 Position handle_opening() {
   m.field_output();
   // Set stone position
-  Position pos = active_player->place_marker();
+  Position pos = active_player->place_marker(&m);
 
   std::cout << pos.y << " " << pos.x << std::endl;
   bool success = m.player_set_stone(active_player->marker, &pos);

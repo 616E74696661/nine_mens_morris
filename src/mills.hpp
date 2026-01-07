@@ -25,8 +25,13 @@ public:
     ENDGAME = 2
   };
 
-  void field_output() {
+  char get_field_marker_at_position(std::pair<int, int> pos) {
+    int y_pos = get_y_pos(pos.second);
+    int x_pos = get_x_pos(pos.first);
+    return field_template[y_pos][x_pos];
+  }
 
+  void field_output() {
     for (int i = 0; i < Y; i++) {
       if (i % 2 == 0 && i != Y - 1)
         std::cout << 7 - (i / 2) << "  ";
