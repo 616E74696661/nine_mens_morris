@@ -4,13 +4,16 @@
 #include <string>
 
 namespace error_msg {
-static const std::string CREATE_GAME_ERROR = "error while creating game";
-static const std::string TOO_MANY_PLAYERS_ERROR = "error on creating players";
-static const std::string POSITION_OCCUPIED = "invalid move, position occupied. Please try again";
-static const std::string INVALID_POSITION = "invalid position coordinates";
-static const std::string INVALID_SELECTION = "invalid selection, please try again";
-const std::string INVALID_MOVE = "invalid move, please try again";
-const std::string TOO_MANY_PLAYERS = "too many players, maximum is 2";
+static const std::string CREATE_GAME_ERROR = "Error while creating game";
+static const std::string TOO_MANY_PLAYERS_ERROR = "Error while creating players";
+static const std::string POSITION_OCCUPIED = "Invalid move, position occupied. Please try again";
+static const std::string POSITION_NOT_OCCUPIED = "Invalid move, position not occupied. Please try again";
+static const std::string NOT_YOUR_STONE = "Invalid move, not allowed to move the stone of opponent. Please try again";
+static const std::string INVALID_POSITION = "Invalid position coordinates";
+static const std::string INVALID_SELECTION = "Invalid selection, please try again";
+static const std::string INVALID_INPUT_TYPE = "Input has to be a number. Please try again.";
+const std::string INVALID_MOVE = "Invalid move, please try again";
+const std::string TOO_MANY_PLAYERS = "Too many players, maximum is 2";
 const std::string INVALID_REMOVAL = "invalid removal, please select an opponent's marker";
 }; // namespace error_msg
 #endif

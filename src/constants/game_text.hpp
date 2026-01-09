@@ -4,14 +4,14 @@
 #include <string>
 namespace game_text {
 static const std::string WELCOME = "Welcome to Muehle!";
-static const std::string GAME_MODE = "Please select a game mode: \r\n1. Player vs Player\r\n2. Player vs Bot";
+static const std::string GAME_MODE = "Please select a game mode:\n1. Player vs Player\n2. Player vs Bot\n";
 
-static const std::string WIN = "you won! :)";
-static const std::string LOSE = "you lost! :(";
-static const std::string INVALID_INPUT = "invalid input";
+static const std::string WIN = "You won! :)";
+static const std::string LOSE = "You lost! :(";
+static const std::string INVALID_INPUT = "Invalid input";
 static const std::string OPTIONS =
-    "press '1' to start playing\npress '2' to go to the settings";
+    "Press '1' to start playing\nPress '2' to go to the settings";
 static const std::string SETTINGS =
-    "press 'a' to set the color of the players\npress 'b' to";
+    "Press 'a' to set the color of the players\nPress 'b' to";
 }; // namespace game_text
 #endif
