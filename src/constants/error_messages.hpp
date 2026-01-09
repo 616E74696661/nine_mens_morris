@@ -11,5 +11,6 @@ static const std::string INVALID_POSITION = "invalid position coordinates";
 static const std::string INVALID_SELECTION = "invalid selection, please try again";
 const std::string INVALID_MOVE = "invalid move, please try again";
 const std::string TOO_MANY_PLAYERS = "too many players, maximum is 2";
+const std::string INVALID_REMOVAL = "invalid removal, please select an opponent's marker";
 }; // namespace error_msg
 #endif

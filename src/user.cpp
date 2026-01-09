@@ -38,7 +38,7 @@ public:
   virtual void move_marker() {
   }
 
-  virtual void remove_opponent_marker() {
+  virtual void remove_opponent_marker(Mills* m) {
   }
 };
 

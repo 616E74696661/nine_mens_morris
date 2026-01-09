@@ -30,8 +30,23 @@ public:
       std::cout << field_template[i] << std::endl;
     }
   }
+
   void stone_set() {
     stones_set++;
+  }
+
+  bool player_remove_stone(char active_player_marker, Position* pos) {
+    int pos_y = get_y_pos(pos->y);
+    int pos_x = get_x_pos(pos->x);
+
+    if (field_template[pos_y][pos_x] != active_player_marker && field_template[pos_y][pos_x] != '#') {
+      field_template[pos_y][pos_x] = '#';
+      std::cout << "successfully removed :3" << std::endl;
+      return true;
+    } else {
+      std::cout << error_msg::INVALID_REMOVAL << std::endl;
+      return false;
+    }
   }
 
   int all_stones_set() {
