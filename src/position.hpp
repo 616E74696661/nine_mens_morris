@@ -5,7 +5,7 @@
 #include <algorithm>
 #include <array>
 #include <random>
-#include <vector>
+#include <tuple>
 
 static std::array<std::pair<int, int>, 24> valid_positions{
     {{1, 1},
@@ -32,24 +32,6 @@ static std::array<std::pair<int, int>, 24> valid_positions{
      {1, 7},
      {4, 7},
      {7, 7}}};
-
-static std::vector<std::array<std::pair<int, int>, 3>> valid_mills{
-    {{{1, 1}, {1, 4}, {1, 7}}},
-    {{{2, 2}, {2, 4}, {2, 6}}},
-    {{{3, 3}, {3, 4}, {3, 5}}},
-    {{{4, 1}, {4, 2}, {4, 3}}},
-    {{{4, 5}, {4, 6}, {4, 7}}},
-    {{{5, 3}, {5, 4}, {5, 5}}},
-    {{{6, 2}, {6, 4}, {6, 6}}},
-    {{{7, 1}, {7, 4}, {7, 7}}},
-    {{{1, 1}, {4, 1}, {7, 1}}},
-    {{{2, 2}, {4, 2}, {6, 2}}},
-    {{{3, 3}, {4, 3}, {5, 3}}},
-    {{{1, 4}, {2, 4}, {3, 4}}},
-    {{{5, 4}, {6, 4}, {7, 4}}},
-    {{{3, 5}, {4, 5}, {5, 5}}},
-    {{{2, 6}, {4, 6}, {6, 6}}},
-    {{{1, 7}, {4, 7}, {7, 7}}}};
 
 static std::array<std::array<int, 4>, 24> adjacency_neighbour = {{
     {1, 9, -1, -1},   // 0: (1,1) → (4,1), (1,4)
@@ -96,13 +78,24 @@ public:
 
   virtual ~Position() = default;
 
-  bool is_valid(int x_pos, int y_pos) {
+  bool operator==(const Position& other) const {
+    return x == other.x && y == other.y;
+  }
+  bool operator<(const Position& other) const {
+    return std::tie(x, y) < std::tie(other.x, other.y);
+  }
+
+  static bool is_valid(int x_pos, int y_pos) {
     for (const auto& p : valid_positions) {
       if (p.first == x_pos && p.second == y_pos) {
         return true;
       }
     }
     return false;
+  }
+
+  bool is_valid() {
+    return is_valid(x, y);
   }
 
   static int get_index(int x_pos, int y_pos) {
@@ -127,33 +120,16 @@ public:
     printf("%i and %i are NOT neighbours\n", pos1index, pos2index);
     return false;
   }
-
-  std::vector<std::array<std::pair<int, int>, 3>>
-  get_possible_mills() {
-    std::vector<std::array<std::pair<int, int>, 3>> mills;
-    for (const auto& mill : valid_mills) {
-      for (const auto& pos : mill) {
-        if (pos.first == x && pos.second == y) {
-          mills.push_back(mill);
-        }
-      }
-    }
-    return mills;
-  }
-};
-
-struct Invalid_Position : Position {
-  Invalid_Position() : Position() {}
 };
 
 static Position get_random_position() {
   std::random_device rd;
   std::mt19937 gen(rd());
-  std::uniform_int_distribution<> dist(0, 23);
+  std::uniform_int_distribution<> dist(0, valid_positions.size() - 1);
 
   int randomNumber = dist(gen);
-  return Position(valid_positions[randomNumber].first,
-                  valid_positions[randomNumber].second);
+  return Position{valid_positions[randomNumber].first,
+                  valid_positions[randomNumber].second};
 }
 
 #endif // POSITION_HPP

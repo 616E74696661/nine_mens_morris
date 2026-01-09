@@ -12,9 +12,9 @@ const std::string OS = "windows";
 const std::string OS = "other"; // macos/linux
 #endif
 
-class Mills {
+class Field {
 public:
-  Mills() {
+  Field() {
     current_phase = OPENING;
     stones_set = 0;
   }
@@ -25,9 +25,9 @@ public:
     ENDGAME = 2
   };
 
-  char get_field_marker_at_position(std::pair<int, int> pos) {
-    int y_pos = get_y_pos(pos.second);
-    int x_pos = get_x_pos(pos.first);
+  char get_field_marker_at_position(Position pos) {
+    int y_pos = get_y_pos(pos.y);
+    int x_pos = get_x_pos(pos.x);
     return field_template[y_pos][x_pos];
   }
 
@@ -55,6 +55,35 @@ public:
 
   void stone_set() {
     stones_set++;
+  }
+
+  bool player_move_stone(char active_player_marker, Position* old_pos, Position* new_pos) {
+    int old_y_pos = get_y_pos(old_pos->y);
+    int old_x_pos = get_x_pos(old_pos->x);
+    int new_y_pos = get_y_pos(new_pos->y);
+    int new_x_pos = get_x_pos(new_pos->x);
+
+    // clear_console();
+
+    // Check if new position is empty
+    if (field_template[new_y_pos][new_x_pos] != '#') {
+      std::cout << error_msg::POSITION_OCCUPIED << std::endl;
+      return false;
+    }
+    std::cout << "New position valid" << std::endl;
+
+    if (field_template[old_y_pos][old_x_pos] == active_player_marker) {
+
+      std::cout << "Old position valid" << std::endl;
+
+      field_template[old_y_pos][old_x_pos] = '#';
+      field_template[new_y_pos][new_x_pos] = active_player_marker;
+      std::cout << "successfully moved :3" << std::endl;
+      return true;
+    } else {
+      std::cout << error_msg::INVALID_MOVE << std::endl;
+      return false;
+    }
   }
 
   bool player_remove_stone(char active_player_marker, Position* pos) {
@@ -105,13 +134,13 @@ public:
     return true;
   }
 
-  bool check_mill(std::array<std::pair<int, int>, 3> mill, char marker) {
+  bool check_mill(std::array<Position, 3> mill, char marker) {
 
     int counter = 0;
 
     for (const auto& pos : mill) {
-      int y_pos = get_y_pos(pos.second);
-      int x_pos = get_x_pos(pos.first);
+      int y_pos = get_y_pos(pos.y);
+      int x_pos = get_x_pos(pos.x);
       if (field_template[y_pos][x_pos] == marker) {
         counter++;
       }

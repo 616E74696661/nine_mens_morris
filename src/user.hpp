@@ -1,7 +1,7 @@
 #ifndef USER_CLASS_HPP
 #define USER_CLASS_HPP
 
-#include "Mills.hpp"
+#include "Field.hpp"
 #include "constants/error_messages.hpp"
 #include "position.hpp"
 #include <string>
@@ -30,7 +30,7 @@ public:
     num_players++;
     define_marker();
   }
-  virtual Position place_marker(Mills* m) {
+  virtual Position place_marker(Field* f) {
     return Position();
   }
 
@@ -38,7 +38,7 @@ public:
     return std::make_pair(Position(), Position());
   }
 
-  virtual void remove_opponent_marker(Mills* m) {
+  virtual void remove_opponent_marker(Field* f) {
   }
 };
 

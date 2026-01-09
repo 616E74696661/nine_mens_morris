@@ -10,7 +10,7 @@ public:
   player_user(std::string name) : user(name) {
   }
 
-  Position place_marker(Mills* m) override {
+  Position place_marker(Field* f) override {
     std::cout << "It's your turn, " << this->name << "!" << std::endl;
     std::cout << "Select stone position:" << std::endl;
 
@@ -25,11 +25,11 @@ public:
     } catch (const std::string& e) {
       std::cout << e << std::endl;
       // Retry placing marker
-      return place_marker(m);
+      return place_marker(f);
     }
   }
 
-  void remove_opponent_marker(Mills* m) override {
+  void remove_opponent_marker(Field* f) override {
     std::cout << "You formed a mill! Select an opponent's marker to remove:" << std::endl;
 
     int pos_y;
@@ -41,15 +41,15 @@ public:
       std::cout << "x: ";
       std::cin >> pos_x;
       Position pos(pos_x, pos_y);
-      bool success = m->player_remove_stone(this->marker, &pos);
+      bool success = f->player_remove_stone(this->marker, &pos);
       if (!success) {
         // Retry removing opponent's marker
-        remove_opponent_marker(m);
+        remove_opponent_marker(f);
       }
     } catch (const std::string& e) {
       std::cout << e << std::endl;
       // Retry removing opponent's marker
-      remove_opponent_marker(m);
+      remove_opponent_marker(f);
     }
   }
 
