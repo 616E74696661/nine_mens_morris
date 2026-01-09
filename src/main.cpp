@@ -102,8 +102,7 @@ void handle_mill(Mills* m, Position* pos, char marker) {
       pos->get_possible_mills();
   for (const auto& mill : mills) {
     if (m->check_mill(mill, marker)) {
-      std::cout << "Mill formed!" << std::endl;
-      // TODO: handle removing opponent's piece
+      active_player->remove_opponent_marker(m);
     }
   }
 }
