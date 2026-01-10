@@ -1,8 +1,8 @@
 #ifndef USER_CLASS_HPP
 #define USER_CLASS_HPP
 
-#include "Field.hpp"
 #include "constants/error_messages.hpp"
+#include "field.hpp"
 #include "position.hpp"
 #include <string>
 
