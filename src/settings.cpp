@@ -14,22 +14,22 @@ enum GameMode {
 
 class Settings {
 public:
-  std::vector<user*> setup() {
-    int mode = read_int(game_text::GAME_MODE);
+  std::vector<User*> setup() {
+    unsigned int mode = Helper::read_uint(game_text::GAME_MODE);
     if (mode == PLAYER_VS_PLAYER) {
       std::cout << "Player vs Player mode selected." << std::endl;
 
-      std::vector<user*> players;
-      players.push_back(new player_user("Player 1"));
-      players.push_back(new player_user("Player 2"));
+      std::vector<User*> players;
+      players.push_back(new PlayerUser("Player 1"));
+      players.push_back(new PlayerUser("Player 2"));
       return players;
 
     } else if (mode == PLAYER_VS_BOT) {
       std::cout << "Player vs Bot mode selected." << std::endl;
 
-      std::vector<user*> players;
-      players.push_back(new player_user("Player 1"));
-      players.push_back(new bot_user("Bot"));
+      std::vector<User*> players;
+      players.push_back(new PlayerUser("Player 1"));
+      players.push_back(new BotUser("Bot"));
       return players;
 
     } else {

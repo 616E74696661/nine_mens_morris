@@ -2,44 +2,60 @@
 #define USER_CLASS_HPP
 
 #include "constants/error_messages.hpp"
-#include "field.hpp"
 #include "position.hpp"
+#include <stdexcept>
 #include <string>
 
-static int num_players = 0;
+class Field; // forward declaration, else clangd error
 
-class user {
+static unsigned int num_players = 0;
+
+class User {
 private:
+  unsigned int stones_set;
+  unsigned int stones_removed; // stones_set minus player stones on the board
   void define_marker() {
     if (num_players == 1) {
       this->marker = 'O';
     } else if (num_players == 2) {
       this->marker = 'X';
     } else {
-      throw error_msg::TOO_MANY_PLAYERS;
+      throw std::logic_error(error_msg::TOO_MANY_PLAYERS);
     }
   }
 
 protected:
-  virtual ~user() = default;
+  virtual ~User() = default;
 
 public:
   char marker;
   std::string name;
-  user(std::string name) : name(name) {
+  User(std::string name) : name(name) {
     num_players++;
     define_marker();
   }
-  virtual Position place_marker(Field* f) {
-    return Position();
+
+  unsigned int get_stones_set() {
+    return stones_set;
   }
 
-  virtual std::pair<Position, Position> move_marker() {
-    return std::make_pair(Position(), Position());
+  unsigned int get_stones_removed() {
+    return stones_removed;
   }
 
-  virtual void remove_opponent_marker(Field* f) {
+  void set_stone() {
+    stones_set++;
   }
+
+  void remove_stone() {
+    stones_removed++;
+  }
+
+  virtual Position place_marker(Field& f) = 0;
+
+  virtual Position move_marker(Field& f, bool three_stones_left = false) = 0;
+
+  virtual void remove_opponent_marker(Field& f, User& other) = 0;
 };
 
 #endif

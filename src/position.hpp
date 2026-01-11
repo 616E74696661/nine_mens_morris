@@ -7,7 +7,7 @@
 #include <random>
 #include <tuple>
 
-static std::array<std::pair<int, int>, 24> valid_positions{
+static std::array<std::pair<unsigned int, unsigned int>, 24> valid_positions{
     {{1, 1},
      {4, 1},
      {7, 1},
@@ -62,16 +62,16 @@ static std::array<std::array<int, 4>, 24> adjacency_neighbour = {{
 
 struct Position {
 public:
-  int x;
-  int y;
+  unsigned int x;
+  unsigned int y;
 
   Position() {
     x = 0, y = 0;
   }
 
-  Position(int x_pos, int y_pos) {
+  Position(unsigned int x_pos, unsigned int y_pos) {
     if (!is_valid(x_pos, y_pos)) {
-      throw error_msg::INVALID_POSITION;
+      throw std::invalid_argument(error_msg::INVALID_POSITION);
     }
     x = x_pos, y = y_pos;
   }
@@ -85,7 +85,7 @@ public:
     return std::tie(x, y) < std::tie(other.x, other.y);
   }
 
-  static bool is_valid(int x_pos, int y_pos) {
+  static bool is_valid(unsigned int x_pos, unsigned int y_pos) {
     for (const auto& p : valid_positions) {
       if (p.first == x_pos && p.second == y_pos) {
         return true;
@@ -98,7 +98,7 @@ public:
     return is_valid(x, y);
   }
 
-  static int get_index(int x_pos, int y_pos) {
+  static int get_index(unsigned int x_pos, unsigned int y_pos) {
     int i = 0;
     for (const auto& p : valid_positions) {
       if (p.first == x_pos && p.second == y_pos) {
@@ -112,10 +112,12 @@ public:
   static bool is_neighbour(Position pos1, Position pos2) {
     int pos1index = get_index(pos1.x, pos1.y);
     int pos2index = get_index(pos2.x, pos2.y);
-    std::array<int, 4> arr = adjacency_neighbour.at(pos1index);
-    if (std::find(arr.begin(), arr.end(), pos2index) != arr.end()) {
-      printf("%i and %i are neighbours\n", pos1index, pos2index);
-      return true;
+    if (pos1index != -1 && pos2index != -1) {
+      std::array<int, 4> arr = adjacency_neighbour.at(pos1index);
+      if (std::find(arr.begin(), arr.end(), pos2index) != arr.end()) {
+        printf("%i and %i are neighbours\n", pos1index, pos2index);
+        return true;
+      }
     }
     printf("%i and %i are NOT neighbours\n", pos1index, pos2index);
     return false;
@@ -127,7 +129,7 @@ static Position get_random_position() {
   std::mt19937 gen(rd());
   std::uniform_int_distribution<> dist(0, valid_positions.size() - 1);
 
-  int randomNumber = dist(gen);
+  unsigned int randomNumber = (unsigned int)dist(gen);
   return Position{valid_positions[randomNumber].first,
                   valid_positions[randomNumber].second};
 }

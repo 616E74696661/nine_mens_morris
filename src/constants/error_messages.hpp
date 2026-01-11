@@ -14,6 +14,7 @@ static const std::string INVALID_SELECTION = "Invalid selection, please try agai
 static const std::string INVALID_INPUT_TYPE = "Input has to be a number. Please try again.";
 const std::string INVALID_MOVE = "Invalid move, please try again";
 const std::string TOO_MANY_PLAYERS = "Too many players, maximum is 2";
-const std::string INVALID_REMOVAL = "invalid removal, please select an opponent's marker";
+const std::string INVALID_REMOVAL = "Invalid removal, please select an opponent's marker.";
+const std::string BOT_PLACE_FAIL = "Bot failed to place stone.";
 }; // namespace error_msg
 #endif

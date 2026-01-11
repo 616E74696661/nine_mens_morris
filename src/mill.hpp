@@ -47,13 +47,13 @@ public:
   }
 
   // Checks if a mill is formed at the given position for the given marker
-  static bool check_mill(const Position& pos, char marker, Field* f) {
+  static bool check_mill(const Position& pos, char marker, Field& f) {
     // Loops through all valid mills
     for (const auto& mill : valid_mills_array) {
       // If the mill includes the position
       if (std::find(mill.begin(), mill.end(), pos) != mill.end()) {
         // Check if the mill is formed
-        if (f->check_mill(mill, marker)) {
+        if (f.check_mill(mill, marker)) {
           return true;
         }
       }
@@ -61,17 +61,17 @@ public:
     return false;
   }
 
-  static std::pair<Mill, Position> check_potential_mills(Field* f, char marker) {
+  static std::pair<Mill, Position> check_potential_mills(Field& f, char marker) {
     // Returns a mill that can be completed and the free position to complete it
 
     for (const auto& mill : valid_mills_array) {
-      int player_in_question_stones = 0;
-      int other_player_stones = 0;
+      unsigned int player_in_question_stones = 0;
+      unsigned int other_player_stones = 0;
       Position free_pos = Position();
 
       // Check every possible mill for completable mills
       for (const auto& pos : mill) {
-        char field_marker = f->get_field_marker_at_position(pos);
+        char field_marker = f.get_field_marker_at_position(pos);
         if (field_marker == marker) {
           player_in_question_stones++;
         } else if (field_marker != '#') {
