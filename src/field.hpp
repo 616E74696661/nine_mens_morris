@@ -2,18 +2,13 @@
 #define MILLS_CLASS_HPP
 
 #include "constants/error_messages.hpp"
+#include "helper.hpp"
 #include "position.hpp"
 #include "user.hpp"
 #include <cstddef>
 #include <iostream>
 #include <stdexcept>
 #include <thread>
-
-#ifdef _WIN32
-const std::string OS = "windows";
-#else
-const std::string OS = "other"; // macos/linux
-#endif
 
 class Field {
 public:
@@ -41,23 +36,12 @@ public:
       else
         std::cout << "   ";
       std::cout << field_template[i] << std::endl;
-      std::this_thread::sleep_for(std::chrono::milliseconds((long long)ANIMATION_TIME));
+      std::this_thread::sleep_for(std::chrono::milliseconds((long long)Helper::ANIMATION_TIME));
     }
   }
 
   bool valid_coordinates(unsigned int x, unsigned int y) {
-    return (x < 8 && y < 8);
-  }
-
-  void clear_console() {
-    for (unsigned int i = 0; i < 30; i++) {
-      std::cout << "\n";
-      std::this_thread::sleep_for(std::chrono::milliseconds((long long)ANIMATION_TIME));
-    }
-    if (OS == "windows")
-      system("CLS");
-    else // for linux and macos
-      system("clear");
+    return (x > 0 && x < 8 && y < 8 && y > 0);
   }
 
   void stone_set() {
@@ -74,21 +58,19 @@ public:
     unsigned int new_y_pos = get_y_pos(new_pos.y);
     unsigned int new_x_pos = get_x_pos(new_pos.x);
 
-    // clear_console();
-
     // Check if new position is empty
     if (get_field_marker_at_position(new_pos) != '#') {
       throw std::invalid_argument(error_msg::POSITION_OCCUPIED);
     }
-    std::cout << "New position valid" << std::endl;
+    // std::cout << "New position valid" << std::endl;
 
     if (get_field_marker_at_position(old_pos) == active_player_marker) {
 
-      std::cout << "Old position valid" << std::endl;
+      // std::cout << "Old position valid" << std::endl;
 
       field_template[old_y_pos][old_x_pos] = '#';
       field_template[new_y_pos][new_x_pos] = active_player_marker;
-      std::cout << "successfully moved :3" << std::endl;
+      // std::cout << "successfully moved :3" << std::endl;
       return true;
     } else {
       throw std::invalid_argument(error_msg::INVALID_MOVE);
@@ -101,11 +83,9 @@ public:
     unsigned int y_pos = get_y_pos(pos.y);
     unsigned int x_pos = get_x_pos(pos.x);
 
-    // clear_console();
-
     if (get_field_marker_at_position(pos) == active_player.marker) {
       field_template[y_pos][x_pos] = '#';
-      std::cout << "successfully moved :3" << std::endl;
+      // std::cout << "successfully moved :3" << std::endl;
       return true;
     } else {
       throw std::invalid_argument(error_msg::INVALID_MOVE);
@@ -119,11 +99,9 @@ public:
     unsigned int pos_y = get_y_pos(pos.y);
     unsigned int pos_x = get_x_pos(pos.x);
 
-    // clear_console();
-
     if (get_field_marker_at_position(pos) != active_player_marker && get_field_marker_at_position(pos) != '#') {
       field_template[pos_y][pos_x] = '#';
-      std::cout << "successfully removed :3" << std::endl;
+      // std::cout << "successfully removed :3" << std::endl;
       // noch stones-- bei anderen user hinzufuegen
       other_player.remove_stone();
       return true;
@@ -139,24 +117,24 @@ public:
   void next_phase() {
     if (current_phase < ENDGAME)
       current_phase = static_cast<GamePhase>(static_cast<unsigned int>(current_phase) + 1);
-    std::cout << "NEXT GAMEPHASE" << std::endl;
+    // std::cout << "NEXT GAMEPHASE" << std::endl;
   }
 
-  bool player_set_stone(User& active_player, Position& pos) {
+  bool player_set_stone(User& active_player, Position& pos, bool moved = false) {
     if (!valid_coordinates(pos.x, pos.y))
       throw std::out_of_range(error_msg::INVALID_POSITION);
 
     unsigned int y_pos = get_y_pos(pos.y);
     unsigned int x_pos = get_x_pos(pos.x);
-    // clear_console();
 
     if (get_field_marker_at_position(pos) != T) {
       throw std::invalid_argument(error_msg::POSITION_OCCUPIED);
     }
 
     field_template[y_pos][x_pos] = active_player.marker;
-    active_player.set_stone();
-    std::cout << "successfully set :3" << std::endl;
+    if (!moved)
+      active_player.set_stone();
+    // std::cout << "successfully set :3" << std::endl;
     // stones_set++;
     return true;
   }
@@ -174,7 +152,6 @@ public:
   }
 
 private:
-  static const unsigned int ANIMATION_TIME = 10;
   static const unsigned int X = 26;
   static const short Y = 15;
   static const short STONES = 18;

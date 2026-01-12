@@ -14,6 +14,7 @@ public:
 
   Position place_marker(Field& f) override {
     while (true) {
+      std::cout << "Select stone position:" << std::endl;
       try {
         unsigned int y_pos = Helper::read_uint("y: ");
         unsigned int x_pos = Helper::read_uint("x: ");
@@ -27,7 +28,7 @@ public:
     }
   }
 
-  void remove_opponent_marker(Field& f, User& other) override {
+  Position remove_opponent_marker(Field& f, User& other) override {
     std::cout << "You formed a mill! Select an opponent's marker to remove:" << std::endl;
 
     while (true) {
@@ -37,7 +38,7 @@ public:
         Position pos(x_pos, y_pos);
         bool success = f.opponent_remove_stone(this->marker, pos, other);
         if (success)
-          return;
+          return pos;
       } catch (const std::exception& e) {
         std::cout << e.what() << std::endl;
       }
@@ -51,35 +52,29 @@ public:
    * @param three_stones_left
    * @return Position
    */
-  Position move_marker(Field& f, bool three_stones_left = false) override {
+  std::pair<Position, Position> move_marker(Field& f, bool three_stones_left = false) override {
     while (true) {
+      std::cout << "Select stone you want to move:" << std::endl;
       try {
-        unsigned int y_pos;
-        unsigned int x_pos;
-        Position pos;
-        y_pos = Helper::read_uint("y: ");
-        x_pos = Helper::read_uint("x: ");
-        pos = Position(x_pos, y_pos);
+        unsigned int y_pos = Helper::read_uint("y: ");
+        unsigned int x_pos = Helper::read_uint("x: ");
+        Position pos = Position(x_pos, y_pos);
 
+        // TODO: check if pos even has an empty neighbour before
         if (f.player_remove_stone(*this, pos)) {
           try {
             std::cout << "New position:" << std::endl;
-            unsigned int new_y_pos;
-            unsigned int new_x_pos;
-            Position new_pos;
-
-            new_y_pos = Helper::read_uint("y: ");
-            new_x_pos = Helper::read_uint("x: ");
-            new_pos = Position(new_x_pos, new_y_pos);
+            unsigned int new_y_pos = Helper::read_uint("y: ");
+            unsigned int new_x_pos = Helper::read_uint("x: ");
+            Position new_pos = Position(new_x_pos, new_y_pos);
             // ?????????
             if (!three_stones_left && !pos.is_neighbour(pos, new_pos))
               throw std::invalid_argument(error_msg::INVALID_SELECTION);
-            bool success = f.player_set_stone(*this, new_pos);
-            // bool success = f.player_move_stone(this->marker, pos, new_pos);
+            bool success = f.player_set_stone(*this, new_pos, true);
             if (success)
-              return new_pos;
+              return std::pair<Position, Position>(pos, new_pos);
           } catch (const std::exception& e) {
-            f.player_set_stone(*this, pos);
+            f.player_set_stone(*this, pos, true);
           }
         }
       } catch (const std::exception& e) {

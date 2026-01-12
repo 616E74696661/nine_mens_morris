@@ -53,9 +53,9 @@ public:
 
   virtual Position place_marker(Field& f) = 0;
 
-  virtual Position move_marker(Field& f, bool three_stones_left = false) = 0;
+  virtual std::pair<Position, Position> move_marker(Field& f, bool three_stones_left = false) = 0;
 
-  virtual void remove_opponent_marker(Field& f, User& other) = 0;
+  virtual Position remove_opponent_marker(Field& f, User& other) = 0;
 };
 
 #endif

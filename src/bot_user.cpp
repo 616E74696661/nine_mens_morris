@@ -25,39 +25,52 @@ public:
 
   Position place_marker(Field& f) override {
 
-    // Search for potential mills of player to block
-    std::pair<Mill, Position> mill_and_pos = Mills::check_potential_mills(f, 'O');
-    Position pos = mill_and_pos.second;
-
-    while (true) {
-      try {
-        // If potential opponent mill found, place stone in between
-        if (pos.is_valid()) {
-          std::cout << "Potential mill found." << std::endl;
-        } else {
-          // Search for own potential mills to complete
-          mill_and_pos = Mills::check_potential_mills(f, this->marker);
-          pos = mill_and_pos.second;
-          // If potential mill found, place marker to complete mill
-          if (pos.is_valid())
-            std::cout << "Completing own mill." << std::endl;
-          // @TODO: Place marker adjacent to own stones
-          // if (false /*if there are any adjacent positions to own stones*/) {
-          // Placeholder for future implementation
-          //}
-          // Else place marker randomly
-          else {
-            std::cout << "No potential mill found, placing marker randomly." << std::endl;
-            pos = get_random_position();
-          }
-        }
+    std::pair<Mill, Position> mill_and_pos;
+    Position pos;
+    try {
+      // Search for opponents potential mill to block
+      mill_and_pos = Mills::check_potential_mills(f, 'O');
+      pos = mill_and_pos.second;
+      if (pos.is_valid()) {
+        std::cout << "Potential mill found." << std::endl;
         if (f.player_set_stone(*this, pos)) {
           return pos;
         }
-      } catch (const std::exception& e) {
+      }
+      // Search for own potential mill to block
+      mill_and_pos = Mills::check_potential_mills(f, this->marker);
+      pos = mill_and_pos.second;
+      if (pos.is_valid()) {
+        std::cout << "Completing own mill." << std::endl;
+        if (f.player_set_stone(*this, pos)) {
+          return pos;
+        }
+      }
+    } catch (const std::exception& e) {
+      std::cout << e.what() << std::endl;
+    }
+
+    // TODO: for loop with bot_stones_pos and adjacent positions
+    // trying to place a stone near already put stones
+
+    int retries = 10;
+    while (retries > 0) {
+      try {
+        pos = get_random_position();
+        if (f.player_set_stone(*this, pos)) {
+          return pos;
+        }
+        std::cout << "Retrying random placement" << std::endl;
+      }
+
+      catch (const std::exception& e) {
         std::cout << e.what() << std::endl;
       }
+      retries--;
     }
+
+    std::cout << "Failed to place marker" << std::endl;
+    return Position();
   }
 
   /**
@@ -67,7 +80,8 @@ public:
    * @param three_stones_left
    * @return Position
    */
-  Position move_marker(Field& f, bool three_stones_left = false) override {
+  std::pair<Position, Position>
+  move_marker(Field& f, bool three_stones_left = false) override {
 
     // while (true) {
     //   Position pos = get_random_position();
@@ -80,19 +94,17 @@ public:
     //   }
     // }
 
-    return Position();
+    return std::pair<Position, Position>(Position(), Position());
   }
 
-  void remove_opponent_marker(Field& f, User& other) override {
+  Position remove_opponent_marker(Field& f, User& other) override {
+    Position removable_stone;
     while (true) {
       try {
         // Search for potential closed mill of player to block
         std::pair<Mill, Position> mill_and_pos = Mills::check_potential_mills(f, this->marker);
         Mill mill = mill_and_pos.first;
         Position pos = mill_and_pos.second;
-
-        Position removable_stone;
-        bool found = false;
 
         if (pos.is_valid()) {
           // search opponents stone
@@ -103,23 +115,20 @@ public:
             char field_marker = f.get_field_marker_at_position(mill[i]);
             if (field_marker != this->marker && field_marker != '#') {
               removable_stone = mill[i];
-              found = true;
               break;
             }
           }
         }
 
-        if (!found) {
-          removable_stone = get_random_opponent_position(f);
-        }
+        removable_stone = get_random_opponent_position(f);
 
         bool success = f.opponent_remove_stone(this->marker, removable_stone, other);
         if (success)
-          return;
-
+          break;
       } catch (const std::exception& e) {
         std::cout << e.what() << std::endl;
       }
     }
+    return removable_stone;
   }
 };
