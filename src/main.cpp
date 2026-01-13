@@ -1,5 +1,4 @@
 #include "field.hpp"
-#include "helper.hpp"
 #include "mill.hpp"
 #include "settings.cpp"
 #include <cstddef>
@@ -56,6 +55,14 @@ Position game() {
       new_pos = active_player->place_marker(f);
       output = active_player->name + " placed a stone on Position y: " + std::to_string(new_pos.y) + ", x: " + std::to_string(new_pos.x);
     } else if (placed_stones == 9) {
+
+      if (active_player->able_to_make_legal_move(f)) {
+        User& other = get_other_player(*active_player, players);
+        std::cout << active_player->name << " has lost!" << std::endl;
+        std::cout << other.name << " wins the game!" << std::endl;
+        std::exit(0);
+      }
+
       std::pair<Position, Position> pos_pair;
       if (active_player->get_stones_removed() == 3)
         pos_pair = active_player->move_marker(f, true);

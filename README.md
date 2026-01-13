@@ -4,7 +4,7 @@
 
 - 2 players, 9 pieces per player
 - pieces are placed and moved on the line crossing of the board
-- whenever three pieces of the same player are places in a straight row, a mill is closed and one opponent piece has to be removced
+- whenever three pieces of the same player are places in a straight row, a mill is closed and one opponent piece has to be removed
 - the goal of the game is to reduce the opponent to only two pieces or to surround the opponent pieces in such a way that there are no valid moves for the opponent
 
 ### opening

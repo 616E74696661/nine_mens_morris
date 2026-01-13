@@ -23,7 +23,7 @@ public:
     ENDGAME = 2
   };
 
-  char get_field_marker_at_position(Position pos) {
+  char get_field_marker_at_position(Position& pos) {
     unsigned int y_pos = get_y_pos(pos.y);
     unsigned int x_pos = get_x_pos(pos.x);
     return field_template[y_pos][x_pos];
@@ -143,7 +143,7 @@ public:
 
     unsigned int counter = 0;
 
-    for (const auto& pos : mill) {
+    for (auto pos : mill) {
       if (get_field_marker_at_position(pos) == marker) {
         counter++;
       }

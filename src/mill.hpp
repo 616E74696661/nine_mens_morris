@@ -70,7 +70,7 @@ public:
       Position free_pos = Position();
 
       // Check every possible mill for completable mills
-      for (const auto& pos : mill) {
+      for (Position pos : mill) {
         char field_marker = f.get_field_marker_at_position(pos);
         if (field_marker == marker) {
           player_in_question_stones++;

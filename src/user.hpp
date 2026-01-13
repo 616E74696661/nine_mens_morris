@@ -35,6 +35,8 @@ public:
     define_marker();
   }
 
+  bool able_to_make_legal_move(Field& f);
+
   unsigned int get_stones_set() {
     return stones_set;
   }
@@ -51,7 +53,9 @@ public:
     stones_removed++;
   }
 
-  virtual Position place_marker(Field& f) = 0;
+  bool lost(Field& f);
+
+  virtual Position place_marker(Field& f, bool moved = false) = 0;
 
   virtual std::pair<Position, Position> move_marker(Field& f, bool three_stones_left = false) = 0;
 

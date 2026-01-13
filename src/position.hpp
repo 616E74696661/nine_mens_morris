@@ -122,6 +122,21 @@ public:
     printf("%i and %i are NOT neighbours\n", pos1index, pos2index);
     return false;
   }
+
+  std::vector<Position*> get_neighbours() {
+
+    std::pair<unsigned int, unsigned int> pos_coord;
+    std::vector<Position*> neighbours;
+    int pos_index = get_index(x, y);
+    std::array<int, 4> arr = adjacency_neighbour.at(pos_index);
+    for (auto a : arr) {
+      if (a == -1)
+        break;
+      pos_coord = valid_positions.at(a);
+      neighbours.push_back(new Position(pos_coord.first, pos_coord.second));
+    }
+    return neighbours;
+  }
 };
 
 static Position get_random_position() {

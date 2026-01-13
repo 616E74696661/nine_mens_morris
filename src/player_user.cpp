@@ -12,14 +12,14 @@ public:
   PlayerUser(std::string name) : User(name) {
   }
 
-  Position place_marker(Field& f) override {
+  Position place_marker(Field& f, bool moved = false) override {
     while (true) {
       std::cout << "Select stone position:" << std::endl;
       try {
         unsigned int y_pos = Helper::read_uint("y: ");
         unsigned int x_pos = Helper::read_uint("x: ");
         Position pos(x_pos, y_pos);
-        if (f.player_set_stone(*this, pos)) {
+        if (f.player_set_stone(*this, pos, moved)) {
           return pos;
         }
       } catch (const std::exception& e) {
@@ -61,14 +61,16 @@ public:
         Position pos = Position(x_pos, y_pos);
 
         // TODO: check if pos even has an empty neighbour before
+
         if (f.player_remove_stone(*this, pos)) {
           try {
             std::cout << "New position:" << std::endl;
             unsigned int new_y_pos = Helper::read_uint("y: ");
             unsigned int new_x_pos = Helper::read_uint("x: ");
             Position new_pos = Position(new_x_pos, new_y_pos);
-            // ?????????
-            if (!three_stones_left && !pos.is_neighbour(pos, new_pos))
+
+            // check if valid move
+            if (!new_pos.is_valid() || !three_stones_left && !pos.is_neighbour(pos, new_pos))
               throw std::invalid_argument(error_msg::INVALID_SELECTION);
             bool success = f.player_set_stone(*this, new_pos, true);
             if (success)
