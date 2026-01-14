@@ -10,11 +10,12 @@ static const std::string POSITION_OCCUPIED = "Invalid move, position occupied. P
 static const std::string POSITION_NOT_OCCUPIED = "Invalid move, position not occupied. Please try again";
 static const std::string NOT_YOUR_STONE = "Invalid move, not allowed to move the stone of opponent. Please try again";
 static const std::string INVALID_POSITION = "Invalid position coordinates";
+static const std::string NOT_NEIGHBOUR = "New position is not a neighbour. Please try again.";
 static const std::string INVALID_SELECTION = "Invalid selection, please try again";
 static const std::string INVALID_INPUT_TYPE = "Input has to be a number. Please try again.";
-const std::string INVALID_MOVE = "Invalid move, please try again";
-const std::string TOO_MANY_PLAYERS = "Too many players, maximum is 2";
-const std::string INVALID_REMOVAL = "Invalid removal, please select an opponent's marker.";
-const std::string BOT_PLACE_FAIL = "Bot failed to place stone.";
+static const std::string INVALID_MOVE = "Invalid move, please try again";
+static const std::string TOO_MANY_PLAYERS = "Too many players, maximum is 2";
+static const std::string INVALID_REMOVAL = "Invalid removal, please select an opponent's marker.";
+static const std::string BOT_PLACE_FAIL = "Bot failed to place stone.";
 }; // namespace error_msg
 #endif

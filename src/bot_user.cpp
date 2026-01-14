@@ -10,6 +10,7 @@ class BotUser : public User {
 private:
   std::string name = "Bot";
   char opponent_marker = 'O';
+
   /**
    * @brief get a random stone position of opponent
    *
@@ -17,14 +18,12 @@ private:
    * @return Position
    */
   Position get_random_opponent_position(Field& f) {
-    while (true) { // maybe not while(true) ? you should be able to be in this loop forever, but maybe there's a prettier solution idk
-      // Search random positions until an opponent's stone is found
-      Position random_pos = get_random_position();
-      if (f.get_field_marker_at_position(random_pos) != this->marker &&
-          f.get_field_marker_at_position(random_pos) != '#') {
-        return random_pos;
-      }
-    }
+    Position random_pos;
+    do
+      random_pos = get_random_position();
+    while (f.get_field_marker_at_position(random_pos) == this->marker ||
+           f.get_field_marker_at_position(random_pos) == '#');
+    return random_pos;
   }
 
   // Position move_stone_to_potential_mill(Field& f, char marker) {
@@ -34,49 +33,35 @@ private:
   // }
 
 public:
-  BotUser(std::string name) : User(name) {
-  }
+  BotUser(std::string name) : User(name) {}
 
   Position place_marker(Field& f, bool moved = false) override {
-
     std::pair<Mill, Position> mill_and_pos;
     Position pos;
     try {
-      // Search for opponents potential mill to block
+      // block opponent's potential mill
       mill_and_pos = Mills::check_potential_mills(f, opponent_marker);
-      if (pos.is_valid()) {
-        // std::cout << "Potential mill found." << std::endl;
-        if (f.player_set_stone(*this, pos, moved)) {
-          return pos;
-        }
-      }
-      // Search for own potential mill
+      pos = mill_and_pos.second;
+      if (pos.is_valid() && f.player_set_stone(*this, pos, moved))
+        return pos;
+
+      // complete own potential mill
       mill_and_pos = Mills::check_potential_mills(f, this->marker);
       pos = mill_and_pos.second;
-      if (pos.is_valid()) {
-        // std::cout << "Completing own mill." << std::endl;
-        if (f.player_set_stone(*this, pos, moved)) {
-          return pos;
-        }
-      }
+      if (pos.is_valid() && f.player_set_stone(*this, pos, moved))
+        return pos;
     } catch (const std::exception& e) {
       std::cout << e.what() << std::endl;
     }
 
-    // TODO: for loop with bot_stones_pos and adjacent positions
-    // trying to place a stone near already put stones
-
+    // Fallback: random placement
     int retries = 10;
     while (retries-- > 0) {
       try {
         pos = get_random_position();
-        if (f.player_set_stone(*this, pos, moved)) {
+        if (f.player_set_stone(*this, pos, moved))
           return pos;
-        }
-        // std::cout << "Retrying random placement" << std::endl;
-      }
-
-      catch (const std::exception& e) {
+      } catch (const std::exception& e) {
         std::cout << e.what() << std::endl;
       }
     }
@@ -86,58 +71,49 @@ public:
   }
 
   /**
-   * @brief TODO
+   * @brief Move a marker on the field
    *
-   * @param f
-   * @param three_stones_left
-   * @return Position
+   * @param f Field
+   * @param three_stones_left Whether player has only 3 stones (= can jump)
+   * @return std::pair<Position, Position> Old and new positions
    */
   std::pair<Position, Position> move_marker(Field& f, bool three_stones_left = false) override {
-    // while (true) {
-    //   Position pos = get_random_position();
-    //   Position new_pos = get_random_position();
-    //   if (!three_stones_left && !pos.is_neighbour(pos, new_pos))
-    //     continue;
-    //   if (f.player_move_stone(this->marker, pos, new_pos)) {
-    //     return new_pos;
-    //   }
-    // }
-    std::pair<Mill, Position> mill_and_pos;
-    Position pos;
-
-    // check if pos even has an empty neighbour before when not endgame
-
     try {
-      // search for own potential mill
-      mill_and_pos = Mills::check_potential_mills(f, this->marker);
-      pos = mill_and_pos.second;
-      if (pos.is_valid()) {
-        std::vector<Position*> neighbours = pos.get_neighbours();
+      // try to complete own potential mill
+      std::pair<Mill, Position> mill_and_pos = Mills::check_potential_mills(f, this->marker);
+      Position target_pos = mill_and_pos.second;
+      if (target_pos.is_valid()) {
+        std::vector<Position*> neighbours = target_pos.get_neighbours();
         for (auto neighbour : neighbours) {
-          // if neighbour is own stone, move stone to pos
           if (f.get_field_marker_at_position(*neighbour) == this->marker) {
-            bool success = f.player_set_stone(*this, *neighbour, true);
-            if (success)
-              return std::pair<Position, Position>(pos, *neighbour);
+            // remove stone from current position
+            if (f.player_remove_stone(*this, *neighbour)) {
+              // try to place at target position
+              if (f.player_set_stone(*this, target_pos, true))
+                return std::make_pair(*neighbour, target_pos);
+              // rollback if placement failed
+              f.player_set_stone(*this, *neighbour, true);
+            }
           }
         }
       }
-
-      if (f.player_remove_stone(*this, pos)) {
-        try {
-          std::cout << "New position:" << std::endl;
-          unsigned int new_y_pos = Helper::read_uint("y: ");
-          unsigned int new_x_pos = Helper::read_uint("x: ");
-          Position new_pos = Position(new_x_pos, new_y_pos);
-          // ?????????
-          if (!three_stones_left && !pos.is_neighbour(pos, new_pos))
-            throw std::invalid_argument(error_msg::INVALID_SELECTION);
-          bool success = f.player_set_stone(*this, new_pos, true);
-          if (success)
-            return std::pair<Position, Position>(pos, new_pos);
-        } catch (const std::exception& e) {
-          f.player_set_stone(*this, pos, true);
-        }
+      // fallback: random move
+      int retries = 10;
+      while (retries-- > 0) {
+        Position from_pos = get_random_position();
+        Position to_pos = get_random_position();
+        // check if from_pos is our stone
+        if (f.get_field_marker_at_position(from_pos) != this->marker)
+          continue;
+        // check adjacency constraint (unless we can jump with 3 stones)
+        if (!three_stones_left && !from_pos.is_neighbour(from_pos, to_pos))
+          continue;
+        // try the move
+        if (f.player_remove_stone(*this, from_pos))
+          if (f.player_set_stone(*this, to_pos, true))
+            return std::make_pair(from_pos, to_pos);
+        // rollback
+        f.player_set_stone(*this, from_pos, true);
       }
     } catch (const std::exception& e) {
       std::cout << e.what() << std::endl;
@@ -147,18 +123,15 @@ public:
 
   Position remove_opponent_marker(Field& f, User& other) override {
     Position removable_stone;
-    std::pair<Mill, Position> mill_and_pos;
-    Mill mill;
-    Position pos;
+
     while (true) {
       try {
-        // Search for potential closed mill of opponent to block
-        mill_and_pos = Mills::check_potential_mills(f, this->marker);
-        mill = mill_and_pos.first;
-        pos = mill_and_pos.second;
+        // try to block opponent's potential mill
+        std::pair<Mill, Position> mill_and_pos = Mills::check_potential_mills(f, this->marker);
+        Mill mill = mill_and_pos.first;
+        Position pos = mill_and_pos.second;
 
-        if (pos.is_valid()) {
-          // search opponents stone
+        if (pos.is_valid())
           for (std::size_t i = 0; i < mill.size(); ++i) {
             if (mill[i] == pos)
               continue;
@@ -169,12 +142,12 @@ public:
               break;
             }
           }
-        }
 
-        removable_stone = get_random_opponent_position(f);
+        // fallback: random opponent stone
+        if (!removable_stone.is_valid())
+          removable_stone = get_random_opponent_position(f);
 
-        bool success = f.opponent_remove_stone(this->marker, removable_stone, other);
-        if (success)
+        if (f.opponent_remove_stone(this->marker, removable_stone, other))
           break;
       } catch (const std::exception& e) {
         std::cout << e.what() << std::endl;

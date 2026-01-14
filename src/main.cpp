@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <iostream>
 #include <stdexcept>
+#include <stdlib.h>
 #include <string>
 #include <vector>
 
@@ -43,20 +44,22 @@ void init() {
 
 Position game() {
   if (active_player != nullptr) {
-    BotUser* bot_player = dynamic_cast<BotUser*>(active_player);
     std::string output;
     Position new_pos;
+    // check if player is bot
+    BotUser* bot_player = dynamic_cast<BotUser*>(active_player);
     if (bot_player == nullptr) {
       f.field_output();
       std::cout << "It's your turn, " << active_player->name << "!" << std::endl;
     }
     unsigned int placed_stones = active_player->get_stones_set();
+    unsigned int stones_left = placed_stones - active_player->get_stones_removed();
     if (placed_stones < 9) {
       new_pos = active_player->place_marker(f);
       output = active_player->name + " placed a stone on Position y: " + std::to_string(new_pos.y) + ", x: " + std::to_string(new_pos.x);
     } else if (placed_stones == 9) {
 
-      if (active_player->able_to_make_legal_move(f)) {
+      if (!active_player->able_to_make_legal_move(f)) {
         User& other = get_other_player(*active_player, players);
         std::cout << active_player->name << " has lost!" << std::endl;
         std::cout << other.name << " wins the game!" << std::endl;
@@ -64,10 +67,10 @@ Position game() {
       }
 
       std::pair<Position, Position> pos_pair;
-      if (active_player->get_stones_removed() == 3)
-        pos_pair = active_player->move_marker(f, true);
-      else
+      if (stones_left == 3)
         pos_pair = active_player->move_marker(f);
+      else
+        pos_pair = active_player->move_marker(f, true);
 
       output = active_player->name + " moved a stone from Position y: " + std::to_string(pos_pair.first.y) + ", x: " + std::to_string(pos_pair.first.x) +
                " to Position y: " + std::to_string(pos_pair.second.y) + ", x: " + std::to_string(pos_pair.second.x);

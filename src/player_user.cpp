@@ -60,8 +60,6 @@ public:
         unsigned int x_pos = Helper::read_uint("x: ");
         Position pos = Position(x_pos, y_pos);
 
-        // TODO: check if pos even has an empty neighbour before
-
         if (f.player_remove_stone(*this, pos)) {
           try {
             std::cout << "New position:" << std::endl;
@@ -69,14 +67,25 @@ public:
             unsigned int new_x_pos = Helper::read_uint("x: ");
             Position new_pos = Position(new_x_pos, new_y_pos);
 
-            // check if valid move
-            if (!new_pos.is_valid() || !three_stones_left && !pos.is_neighbour(pos, new_pos))
+            // Check adjacency constraint if not in endgame
+            if (!three_stones_left && !Position::is_neighbour(pos, new_pos)) {
               throw std::invalid_argument(error_msg::INVALID_SELECTION);
+            }
+
             bool success = f.player_set_stone(*this, new_pos, true);
-            if (success)
-              return std::pair<Position, Position>(pos, new_pos);
+            if (success) {
+              return std::make_pair(pos, new_pos);
+            }
+
           } catch (const std::exception& e) {
-            f.player_set_stone(*this, pos, true);
+            std::cout << e.what() << std::endl;
+            // Rollback: put the stone back - wrap in try-catch to handle invalid pos
+            try {
+              f.player_set_stone(*this, pos, true);
+            } catch (...) {
+              // If rollback fails, the stone is already removed from the field
+              // This shouldn't happen in normal gameplay
+            }
           }
         }
       } catch (const std::exception& e) {
