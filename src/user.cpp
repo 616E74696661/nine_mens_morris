@@ -1,10 +1,9 @@
-#include "user.hpp"
 #include "field.hpp" // full definition of Field is needed
 #include <vector>
 
 // "User::" so we can use the user variables
 
-bool User::able_to_make_legal_move(Field& f) {
+bool able_to_make_legal_move(Field& f) {
   std::vector<Position> own_stones;
 
   // Iteriere nur über die vordefinierten gültigen Positionen
@@ -41,7 +40,7 @@ bool User::able_to_make_legal_move(Field& f) {
 
   // Midgame: check neighbours
   for (Position& stone_pos : own_stones) {
-    std::vector<Position*> neighbours = stone_pos.get_neighbours();
+    std::vector<Position*> neighbours = stone_pos.get_adjacent_positions();
     for (Position* neighbour : neighbours) {
       try {
         if (f.get_field_marker_at_position(*neighbour) == '#') {

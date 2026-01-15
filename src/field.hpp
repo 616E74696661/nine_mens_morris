@@ -5,10 +5,10 @@
 #include "helper.hpp"
 #include "position.hpp"
 #include "user.hpp"
-#include <cstddef>
 #include <iostream>
 #include <stdexcept>
 #include <thread>
+#include <vector>
 
 class Field {
 public:
@@ -24,7 +24,7 @@ public:
   };
 
   char get_field_marker_at_position(Position& pos) {
-    if (!valid_coordinates(pos.x, pos.y)) {
+    if (!pos.is_valid()) {
       throw std::out_of_range(error_msg::INVALID_POSITION);
     }
     unsigned int y_pos = get_y_pos(pos.y);
@@ -33,8 +33,8 @@ public:
   }
 
   void field_output() {
-    for (unsigned int i = 0; i < Y; i++) {
-      if (i % 2 == 0 && i != Y - 1)
+    for (unsigned int i = 0; i < FIELD_HEIGHT; i++) {
+      if (i % 2 == 0 && i != FIELD_HEIGHT - 1)
         std::cout << 7 - (i / 2) << "  ";
       else
         std::cout << "   ";
@@ -43,15 +43,11 @@ public:
     }
   }
 
-  bool valid_coordinates(unsigned int x, unsigned int y) const {
-    return (x > 0 && x < 8 && y < 8 && y > 0);
-  }
-
   void stone_set() {
     stones_set++;
   }
 
-  // bool player_move_stone(User& active_player, Position& old_pos, Position& new_pos, bool three_stones_left = false) {
+  // bool player_move_stone(User& active_user, Position& old_pos, Position& new_pos, bool three_stones_left = false) {
   //   // Validate coordinates first
   //   if (!valid_coordinates(old_pos.x, old_pos.y))
   //     throw std::out_of_range(error_msg::INVALID_POSITION);
@@ -59,7 +55,7 @@ public:
   //     throw std::out_of_range(error_msg::INVALID_POSITION);
 
   //   // Check if old position has player's stone
-  //   if (get_field_marker_at_position(old_pos) != active_player.marker) {
+  //   if (get_field_marker_at_position(old_pos) != active_user.marker) {
   //     throw std::invalid_argument(error_msg::INVALID_MOVE);
   //   }
   //   if (!three_stones_left && !Position::is_neighbour(old_pos, new_pos))
@@ -76,45 +72,40 @@ public:
   //   unsigned int new_x_pos = get_x_pos(new_pos.x);
 
   //   field_template[old_y_pos][old_x_pos] = T;
-  //   field_template[new_y_pos][new_x_pos] = active_player.marker;
+  //   field_template[new_y_pos][new_x_pos] = active_user.marker;
 
   //   return true;
   // }
-
-  bool player_remove_stone(User& active_player, Position& pos) {
-    // Validate coordinates
-    if (!valid_coordinates(pos.x, pos.y))
+  void validate_coordinates(Position& pos, char marker) {
+    // Validate coordinates and verify position has correct marker
+    if (!pos.is_valid()) {
       throw std::out_of_range(error_msg::INVALID_POSITION);
+    }
 
-    // Check if position has player's stone
-    if (get_field_marker_at_position(pos) != active_player.marker) {
+    if (get_field_marker_at_position(pos) != marker) {
       throw std::invalid_argument(error_msg::INVALID_MOVE);
     }
+  }
+
+  void player_remove_stone(User& active_user, Position& pos) {
+    // Validate coordinates
+    validate_coordinates(pos, active_user.marker);
 
     // Remove the stone
     unsigned int y_pos = get_y_pos(pos.y);
     unsigned int x_pos = get_x_pos(pos.x);
-    field_template[y_pos][x_pos] = T;
-
-    return true;
+    field_template[y_pos][x_pos] = EMPTY_FIELD;
   }
 
-  bool opponent_remove_stone(char active_player_marker, Position& pos, User& other_player) {
-    // Validate coordinates
-    if (!valid_coordinates(pos.x, pos.y))
-      throw std::out_of_range(error_msg::INVALID_POSITION);
-
-    // Check if position has opponent's stone (not active player's, not empty)
-    char marker = get_field_marker_at_position(pos);
-    if (marker == active_player_marker || marker == T) {
-      throw std::invalid_argument(error_msg::INVALID_REMOVAL);
-    }
+  bool opponent_remove_stone(char active_user_marker, Position& pos, User& opponent_user) {
+    // Validate coordinates (must be opponent's marker)
+    validate_coordinates(pos, opponent_user.marker);
 
     // Remove the stone
     unsigned int pos_y = get_y_pos(pos.y);
     unsigned int pos_x = get_x_pos(pos.x);
-    field_template[pos_y][pos_x] = T;
-    other_player.remove_stone();
+    field_template[pos_y][pos_x] = EMPTY_FIELD;
+    opponent_user.remove_stone();
 
     return true;
   }
@@ -128,23 +119,23 @@ public:
       current_phase = static_cast<GamePhase>(static_cast<unsigned int>(current_phase) + 1);
   }
 
-  bool player_set_stone(User& active_player, Position& pos, bool moved = false) {
+  bool player_set_stone(User& active_user, Position& pos, bool moved = false) {
     // Validate coordinates
-    if (!valid_coordinates(pos.x, pos.y))
+    if (!pos.is_valid())
       throw std::out_of_range(error_msg::INVALID_POSITION);
 
     // Check if position is empty
-    if (get_field_marker_at_position(pos) != T) {
+    if (get_field_marker_at_position(pos) != EMPTY_FIELD) {
       throw std::invalid_argument(error_msg::POSITION_OCCUPIED);
     }
 
     // Place the stone
     unsigned int y_pos = get_y_pos(pos.y);
     unsigned int x_pos = get_x_pos(pos.x);
-    field_template[y_pos][x_pos] = active_player.marker;
+    field_template[y_pos][x_pos] = active_user.marker;
 
     if (!moved) {
-      active_player.set_stone();
+      active_user.set_stone();
     }
 
     return true;
@@ -166,15 +157,33 @@ public:
     return counter == 3;
   }
 
+  std::vector<Position> get_all_players_stones(char marker) {
+
+    std::vector<Position> players_positions;
+
+    for (auto pos : get_valid_positions()) {
+      if (get_field_marker_at_position(pos) == marker) {
+        players_positions.push_back(pos);
+      }
+    }
+
+    // Check for invalid values
+    if (sizeof(players_positions) < 3 || sizeof(players_positions) > 9) {
+      throw error_msg::INVALID_NUMBER_OF_STONES;
+    }
+
+    return players_positions;
+  }
+
 private:
-  static const unsigned int X = 26;
-  static const short Y = 15;
-  static const short STONES = 18;
-  static const char T = '#';
   GamePhase current_phase;
   unsigned int stones_set;
 
-  char field_template[Y][X] = {
+  static const int FIELD_WIDTH = 26;
+  static const int FIELD_HEIGHT = 15;
+  static const char EMPTY_FIELD = '#';
+
+  char field_template[FIELD_HEIGHT][FIELD_WIDTH] = {
       "#-----------#-----------#",
       "|           |           |",
       "|   #-------#-------#   |",

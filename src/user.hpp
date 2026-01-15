@@ -3,7 +3,6 @@
 
 #include "constants/error_messages.hpp"
 #include "position.hpp"
-#include <stdexcept>
 #include <string>
 
 class Field; // forward declaration, else clangd error
@@ -12,8 +11,8 @@ static unsigned int num_players = 0;
 
 class User {
 private:
-  unsigned int stones_set;
-  unsigned int stones_removed; // stones_set minus player stones on the board
+  int stones_set;
+  int stones_removed; // stones_set minus player stones on the board
   void define_marker() {
     if (num_players == 1) {
       this->marker = 'O';
@@ -37,11 +36,11 @@ public:
 
   bool able_to_make_legal_move(Field& f);
 
-  unsigned int get_stones_set() {
+  int get_stones_set() {
     return stones_set;
   }
 
-  unsigned int get_stones_removed() {
+  int get_stones_removed() {
     return stones_removed;
   }
 
@@ -57,9 +56,13 @@ public:
 
   virtual Position place_marker(Field& f, bool moved = false) = 0;
 
-  virtual std::pair<Position, Position> move_marker(Field& f, bool three_stones_left = false) = 0;
+  virtual std::pair<Position, Position> move_marker(Field& f, bool three_stones_left) = 0;
 
   virtual Position remove_opponent_marker(Field& f, User& other) = 0;
+
+  virtual bool is_bot() {
+    return false;
+  }
 };
 
 #endif

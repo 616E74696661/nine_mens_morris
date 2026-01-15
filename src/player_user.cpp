@@ -3,6 +3,8 @@
 #include "helper.hpp"
 #include "position.hpp"
 #include "user.hpp"
+#include <cstdlib>
+#include <exception>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -45,52 +47,56 @@ public:
     }
   }
 
-  /**
-   * @brief
-   * TODO: check if even able to move the selected stone. if not -> instant throw
-   * @param f
-   * @param three_stones_left
-   * @return Position
-   */
-  std::pair<Position, Position> move_marker(Field& f, bool three_stones_left = false) override {
+  std::pair<Position, Position> move_marker(Field& f, bool three_stones_left) override {
     while (true) {
-      std::cout << "Select stone you want to move:" << std::endl;
+      // select stone to move
+      Position* old_pos;
+
       try {
+        std::cout << "Select stone you want to move:" << std::endl;
         unsigned int y_pos = Helper::read_uint("y: ");
         unsigned int x_pos = Helper::read_uint("x: ");
         Position pos = Position(x_pos, y_pos);
 
-        if (f.player_remove_stone(*this, pos)) {
-          try {
-            std::cout << "New position:" << std::endl;
-            unsigned int new_y_pos = Helper::read_uint("y: ");
-            unsigned int new_x_pos = Helper::read_uint("x: ");
-            Position new_pos = Position(new_x_pos, new_y_pos);
+        f.player_remove_stone(*this, pos);
+        old_pos = &pos;
 
-            // Check adjacency constraint if not in endgame
-            // if (!three_stones_left && !Position::is_neighbour(pos, new_pos)) {
-            //   throw std::invalid_argument(error_msg::INVALID_SELECTION);
-            // }
-            if (three_stones_left || Position::is_neighbour(pos, new_pos))
-              if (f.player_set_stone(*this, new_pos, true)) {
-                return std::pair<Position, Position>(pos, new_pos);
-              }
-            throw std::invalid_argument(error_msg::INVALID_SELECTION);
-
-          } catch (const std::exception& e) {
-            std::cout << e.what() << std::endl;
-            // rollback: put the stone back; wrap in try-catch to handle invalid pos
-            try {
-              f.player_set_stone(*this, pos, true);
-            } catch (...) {
-              // if rollback fails, the stone is already removed from the field
-              // this shouldn't happen in normal gameplay
-            }
-          }
-        }
       } catch (const std::exception& e) {
+        std::cout << "Error at moving stone: Failed to remove stone." << std::endl;
         std::cout << e.what() << std::endl;
+        continue; // restart loop
+      }
+
+      // if we reach this point, stone was successfully removed
+
+      // select new position to move stone to
+      try {
+        std::cout << "Select new position:" << std::endl;
+        unsigned int y_pos = Helper::read_uint("y: ");
+        unsigned int x_pos = Helper::read_uint("x: ");
+        Position new_pos = Position(x_pos, y_pos);
+
+        if (three_stones_left || Position::is_adjacent_position(*old_pos, new_pos)) {
+          f.player_set_stone(*this, new_pos);
+          return std::pair<Position, Position>(*old_pos, new_pos);
+        }
+        throw std::invalid_argument(error_msg::INVALID_SELECTION);
+      } catch (const std::exception& e) {
+        std::cout << "Error at moving stone: Failed to set stone." << std::endl;
+        std::cout << e.what() << std::endl;
+
+        // Rollback necessary
+        try {
+          f.player_set_stone(*this, *old_pos);
+        } catch (const std::exception& e) {
+          std::cout << "Error at rollback during player's move. Quitting program" << std::endl;
+          std::exit(1);
+        }
       }
     }
+  }
+
+  bool is_bot() override {
+    return false;
   }
 };

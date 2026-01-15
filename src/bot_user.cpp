@@ -3,8 +3,10 @@
 #include "position.hpp"
 #include "user.hpp"
 #include <exception>
+#include <float.h>
 #include <iostream>
-#include <stdexcept>
+#include <utility>
+#include <vector>
 
 class BotUser : public User {
 private:
@@ -31,6 +33,76 @@ private:
   //   if ()
   //     return Position(0, 0);
   // }
+
+  Position select_stone_to_move(Field& f, Position* target_pos, Mill* mill, bool* jump_allowed) {
+
+    if (jump_allowed) {
+      // select stone which is not included within the potential mill
+      for (auto pos : f.get_all_players_stones(marker)) {
+        if (!Mills::pos_is_part_of_mill(*target_pos, *mill)) {
+          return *target_pos;
+        }
+      }
+    }
+
+    // Search for adjacent stone to the target position
+    std::vector<Position*> adj_positions = target_pos->get_adjacent_positions();
+    for (auto pos : adj_positions) {
+      if (!Mills::pos_is_part_of_mill(*pos, *mill) && f.get_field_marker_at_position(*pos) == marker) {
+        // Position is not part of the mill and occupied by this bot
+        return *pos;
+      }
+    }
+
+    // Programm should not be able to get here
+    throw "Reached unexpected point in code";
+  }
+
+  std::pair<Position, Position> get_move(Field& f, bool jump_allowed) {
+    // try to complete own potential mill
+    std::pair<Mill, Position> mill_and_pos = Mills::check_potential_mills(f, this->marker);
+    Mill target_mill = mill_and_pos.first;
+    Position target_pos = mill_and_pos.second;
+
+    Position moveable_stone;
+    if (target_pos.is_valid()) {
+      moveable_stone = select_stone_to_move(f, &target_pos, &target_mill, &jump_allowed);
+      f.validate_coordinates(moveable_stone, marker);
+      return std::pair<Position, Position>(moveable_stone, target_pos);
+    }
+
+    // try to block opponents potential mill
+    mill_and_pos = Mills::check_potential_mills(f, opponent_marker);
+    target_mill = mill_and_pos.first;
+    target_pos = mill_and_pos.second;
+
+    if (target_pos.is_valid()) {
+      moveable_stone = select_stone_to_move(f, &target_pos, &target_mill, &jump_allowed);
+      f.validate_coordinates(moveable_stone, marker);
+      return std::pair<Position, Position>(moveable_stone, target_pos);
+    }
+
+    if (jump_allowed) {
+      // return random stone to jump to an empty position
+      Position old_pos = f.get_all_players_stones(marker)[0];
+      Position new_pos = f.get_all_players_stones('#')[0];
+      return std::pair<Position, Position>(old_pos, new_pos);
+
+    } else {
+      // Search for stone with empty neighbour
+      std::vector<Position> own_stones = f.get_all_players_stones(marker);
+      for (auto pos : own_stones) {
+        for (auto neighbour : pos.get_adjacent_positions()) {
+          if (f.get_field_marker_at_position(*neighbour) == '#') {
+            return std::pair<Position, Position>(pos, *neighbour);
+          }
+        }
+      }
+    }
+
+    // Programm should not be able to get here
+    throw "Reached unexpected point in code";
+  }
 
 public:
   BotUser(std::string name) : User(name) {}
@@ -69,21 +141,27 @@ public:
     return Position();
   }
 
-  /**
-   * @brief Move a marker on the field
-   *
-   * @param f Field
-   * @param three_stones_left Whether player has only 3 stones (= can jump)
-   * @return std::pair<Position, Position> Old and new positions
-   */
-  std::pair<Position, Position> move_marker(Field& f, bool three_stones_left = false) override {
+  std::pair<Position, Position> move_marker(Field& f, bool three_stones_left) override {
+
+    // Get move to make
+    std::pair<Position, Position> move = get_move(f, three_stones_left);
+    Position old_pos = move.first;
+    Position new_pos = move.second;
+
+    // Update board
+    f.player_remove_stone(*this, old_pos);
+    f.player_set_stone(*this, new_pos);
+
+    return move;
+
+    /*
     try {
       // try to complete own potential mill
       std::pair<Mill, Position> mill_and_pos = Mills::check_potential_mills(f, this->marker);
       Position target_pos = mill_and_pos.second;
       if (target_pos.is_valid()) {
         if (!three_stones_left) {
-          std::vector<Position*> neighbours = target_pos.get_neighbours();
+          std::vector<Position*> neighbours = target_pos.get_adjacent_positions();
           for (auto neighbour : neighbours) {
             if (f.get_field_marker_at_position(*neighbour) == this->marker) {
               // remove stone from current position
@@ -109,7 +187,7 @@ public:
         if (f.get_field_marker_at_position(from_pos) != this->marker)
           continue;
         // check adjacency constraint (unless we can jump with 3 stones)
-        if (!three_stones_left && !from_pos.is_neighbour(from_pos, to_pos))
+        if (!three_stones_left && !from_pos.is_adjacent_position(from_pos, to_pos))
           continue;
         // try the move
         if (f.player_remove_stone(*this, from_pos))
@@ -122,6 +200,7 @@ public:
       std::cout << e.what() << std::endl;
     }
     return std::pair<Position, Position>(Position(), Position());
+  */
   }
 
   Position remove_opponent_marker(Field& f, User& other) override {
@@ -157,5 +236,9 @@ public:
       }
     }
     return removable_stone;
+  }
+
+  bool is_bot() override {
+    return true;
   }
 };

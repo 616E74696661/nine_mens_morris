@@ -6,6 +6,10 @@
 #include <array>
 #include <random>
 #include <tuple>
+#include <utility>
+#include <vector>
+
+static bool is_valid(unsigned int x_pos, unsigned int y_pos);
 
 static std::array<std::pair<unsigned int, unsigned int>, 24> valid_positions{
     {{1, 1},
@@ -70,7 +74,7 @@ public:
   }
 
   Position(unsigned int x_pos, unsigned int y_pos) {
-    if (!is_valid(x_pos, y_pos)) {
+    if (!::is_valid(x_pos, y_pos)) {
       throw std::invalid_argument(error_msg::INVALID_POSITION);
     }
     x = x_pos, y = y_pos;
@@ -85,17 +89,8 @@ public:
     return std::tie(x, y) < std::tie(other.x, other.y);
   }
 
-  static bool is_valid(unsigned int x_pos, unsigned int y_pos) {
-    for (const auto& p : valid_positions) {
-      if (p.first == x_pos && p.second == y_pos) {
-        return true;
-      }
-    }
-    return false;
-  }
-
   bool is_valid() {
-    return is_valid(x, y);
+    return ::is_valid(x, y);
   }
 
   static int get_index(unsigned int x_pos, unsigned int y_pos) {
@@ -109,7 +104,7 @@ public:
     return -1; // error
   }
 
-  static bool is_neighbour(Position pos1, Position pos2) {
+  static bool is_adjacent_position(Position pos1, Position pos2) {
     int pos1index = get_index(pos1.x, pos1.y);
     int pos2index = get_index(pos2.x, pos2.y);
     std::array<int, 4> arr = adjacency_neighbour.at(pos1index);
@@ -122,21 +117,42 @@ public:
     return false;
   }
 
-  std::vector<Position*> get_neighbours() {
+  std::vector<Position*> get_adjacent_positions() {
 
-    std::pair<unsigned int, unsigned int> pos_coord;
     std::vector<Position*> neighbours;
+
+    // Get adjacent indexes of position
     int pos_index = get_index(x, y);
-    std::array<int, 4> arr = adjacency_neighbour.at(pos_index);
-    for (auto a : arr) {
-      if (a == -1)
-        break;
-      pos_coord = valid_positions.at(a);
-      neighbours.push_back(new Position(pos_coord.first, pos_coord.second));
+    std::array<int, 4> neighbour_indexes = adjacency_neighbour.at(pos_index);
+
+    // Push back valid positions
+    std::pair<unsigned int, unsigned int> pos_coord;
+    for (auto index : neighbour_indexes) {
+      if (index != -1) {
+        pos_coord = valid_positions.at(index);
+        neighbours.push_back(new Position(pos_coord.first, pos_coord.second));
+      }
     }
     return neighbours;
   }
 };
+
+static std::vector<Position> get_valid_positions() {
+  std::vector<Position> positions;
+  for (std::pair<unsigned int, unsigned int> pos_pair : valid_positions) {
+    positions.push_back(Position(pos_pair.first, pos_pair.second));
+  }
+  return positions;
+}
+
+static bool is_valid(unsigned int x_pos, unsigned int y_pos) {
+  for (const auto& p : valid_positions) {
+    if (p.first == x_pos && p.second == y_pos) {
+      return true;
+    }
+  }
+  return false;
+}
 
 static Position get_random_position() {
   std::random_device rd;

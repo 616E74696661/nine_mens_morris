@@ -65,27 +65,37 @@ public:
     // Returns a mill that can be completed and the free position to complete it
 
     for (const auto& mill : valid_mills_array) {
-      unsigned int player_in_question_stones = 0;
-      unsigned int other_player_stones = 0;
+      unsigned int user_in_question_stones = 0;
+      unsigned int other_user_stones = 0;
       Position free_pos = Position();
 
       // Check every possible mill for completable mills
       for (Position pos : mill) {
         char field_marker = f.get_field_marker_at_position(pos);
         if (field_marker == marker) {
-          player_in_question_stones++;
+          user_in_question_stones++;
         } else if (field_marker != '#') {
-          other_player_stones++;
+          other_user_stones++;
         } else {
           free_pos = pos;
         }
       }
       // If a mill can be completed, return the free position
-      if (player_in_question_stones == 2 && other_player_stones == 0) {
+      if (user_in_question_stones == 2 && other_user_stones == 0) {
         return std::pair<Mill, Position>(mill, free_pos);
       }
     }
-    return std::pair<Mill, Position>(Mill(), Position()); // returns invalid position
+
+    // No potential mill found, returning invalid position
+    return std::pair<Mill, Position>(Mill(), Position());
+  }
+
+  static bool pos_is_part_of_mill(Position& target_pos, Mill& mill) {
+    for (auto pos : mill) {
+      if (pos == target_pos)
+        return true;
+    }
+    return false;
   }
 };
 
