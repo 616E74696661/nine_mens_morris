@@ -4,24 +4,23 @@
 #include <iostream>
 #include <limits>
 #include <string>
-#include <thread>
 
 #ifdef _WIN32
-const std::string OS = "windows";
+const std::string clear_cmd = "cls";
 #else
-const std::string OS = "other"; // macos/linux
+const std::string clear_cmd = "clear";
 #endif
 
 namespace Helper {
-static const unsigned int ANIMATION_TIME = 10;
+static const int ANIMATION_TIME = 10;
 
-inline unsigned int read_uint(const std::string& prompt) {
+inline int read_uint(const std::string& prompt) {
   std::string input;
   std::cout << prompt;
   std::getline(std::cin, input);
 
   size_t pos;
-  unsigned long value;
+  long value;
   try {
     value = std::stoul(input, &pos);
   } catch (std::invalid_argument) {
@@ -31,20 +30,14 @@ inline unsigned int read_uint(const std::string& prompt) {
   }
 
   // ensure full consumption and range
-  if (pos != input.length() || value > std::numeric_limits<unsigned int>::max())
+  if (pos != input.length() || value > std::numeric_limits<int>::max())
     throw std::invalid_argument(error_msg::INVALID_INPUT_TYPE);
 
-  return static_cast<unsigned int>(value);
+  return static_cast<int>(value);
 }
+
 inline void clear_console() {
-  for (unsigned int i = 0; i < 30; i++) {
-    std::cout << "\n";
-    std::this_thread::sleep_for(std::chrono::milliseconds((long long)ANIMATION_TIME));
-  }
-  if (OS == "windows")
-    system("CLS");
-  else // for linux and macos
-    system("clear");
+  system(clear_cmd.c_str());
 }
 
 } // namespace Helper

@@ -4,7 +4,7 @@
 #include <string>
 namespace game_text {
 static const std::string WELCOME = "Welcome to Muehle!";
-static const std::string GAME_MODE = "Please select a game mode:\n1. user vs user\n2. user vs Bot\n";
+static const std::string GAME_MODE = "Please select a game mode:\n1. Player vs Player\n2. Player vs Bot\n";
 
 static const std::string WIN = "You won! :)";
 static const std::string LOSE = "You lost! :(";

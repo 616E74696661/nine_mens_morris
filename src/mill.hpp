@@ -65,8 +65,8 @@ public:
     // Returns a mill that can be completed and the free position to complete it
 
     for (const auto& mill : valid_mills_array) {
-      unsigned int user_in_question_stones = 0;
-      unsigned int other_user_stones = 0;
+      int user_in_question_stones = 0;
+      int other_user_stones = 0;
       Position free_pos = Position();
 
       // Check every possible mill for completable mills

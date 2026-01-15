@@ -14,14 +14,17 @@ public:
   PlayerUser(std::string name) : User(name) {
   }
 
-  Position place_marker(Field& f, bool moved = false) override {
+  Position place_marker(Field& f) override {
+    std::cout << ">>> Set: " << get_stones_set() << " Removed: " << get_stones_removed() << " Board: " << get_stones_on_board() << std::endl;
+
     while (true) {
       std::cout << "Select stone position:" << std::endl;
       try {
-        unsigned int y_pos = Helper::read_uint("y: ");
-        unsigned int x_pos = Helper::read_uint("x: ");
+        int y_pos = Helper::read_uint("y: ");
+        int x_pos = Helper::read_uint("x: ");
         Position pos(x_pos, y_pos);
-        if (f.player_set_stone(*this, pos, moved)) {
+        if (f.player_set_stone(*this, pos)) {
+          __set_stone();
           return pos;
         }
       } catch (const std::exception& e) {
@@ -35,12 +38,14 @@ public:
 
     while (true) {
       try {
-        unsigned int y_pos = Helper::read_uint("y: ");
-        unsigned int x_pos = Helper::read_uint("x: ");
+        int y_pos = Helper::read_uint("y: ");
+        int x_pos = Helper::read_uint("x: ");
         Position pos(x_pos, y_pos);
         bool success = f.opponent_remove_stone(this->marker, pos, other);
-        if (success)
+        if (success) {
+          other.remove_stone();
           return pos;
+        }
       } catch (const std::exception& e) {
         std::cout << e.what() << std::endl;
       }
@@ -54,8 +59,8 @@ public:
 
       try {
         std::cout << "Select stone you want to move:" << std::endl;
-        unsigned int y_pos = Helper::read_uint("y: ");
-        unsigned int x_pos = Helper::read_uint("x: ");
+        int y_pos = Helper::read_uint("y: ");
+        int x_pos = Helper::read_uint("x: ");
         Position pos = Position(x_pos, y_pos);
 
         f.player_remove_stone(*this, pos);
@@ -72,8 +77,8 @@ public:
       // select new position to move stone to
       try {
         std::cout << "Select new position:" << std::endl;
-        unsigned int y_pos = Helper::read_uint("y: ");
-        unsigned int x_pos = Helper::read_uint("x: ");
+        int y_pos = Helper::read_uint("y: ");
+        int x_pos = Helper::read_uint("x: ");
         Position new_pos = Position(x_pos, y_pos);
 
         if (three_stones_left || Position::is_adjacent_position(*old_pos, new_pos)) {

@@ -15,7 +15,7 @@ enum GameMode {
 
 class Settings {
 public:
-  unsigned int mode;
+  int mode;
   std::vector<User*> players;
 
   std::vector<User*> setup() {

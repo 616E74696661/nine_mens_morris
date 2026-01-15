@@ -107,21 +107,28 @@ private:
 public:
   BotUser(std::string name) : User(name) {}
 
-  Position place_marker(Field& f, bool moved = false) override {
+  Position place_marker(Field& f) override {
+
+    std::cout << ">>> How many stones do i currently have on the board: " << get_stones_on_board() << std::endl;
+
     std::pair<Mill, Position> mill_and_pos;
     Position pos;
     try {
       // block opponent's potential mill
       mill_and_pos = Mills::check_potential_mills(f, opponent_marker);
       pos = mill_and_pos.second;
-      if (pos.is_valid() && f.player_set_stone(*this, pos, moved))
+      if (pos.is_valid() && f.player_set_stone(*this, pos)) {
+        __set_stone();
         return pos;
+      }
 
       // complete own potential mill
       mill_and_pos = Mills::check_potential_mills(f, this->marker);
       pos = mill_and_pos.second;
-      if (pos.is_valid() && f.player_set_stone(*this, pos, moved))
+      if (pos.is_valid() && f.player_set_stone(*this, pos)) {
+        __set_stone();
         return pos;
+      }
     } catch (const std::exception& e) {
       std::cout << e.what() << std::endl;
     }
@@ -130,7 +137,7 @@ public:
     while (true) {
       try {
         pos = get_random_position();
-        if (f.player_set_stone(*this, pos, moved))
+        if (f.player_set_stone(*this, pos))
           return pos;
       } catch (const std::exception& e) {
         std::cout << e.what() << std::endl;
@@ -235,6 +242,7 @@ public:
         std::cout << e.what() << std::endl;
       }
     }
+    other.remove_stone();
     return removable_stone;
   }
 

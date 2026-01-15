@@ -27,13 +27,13 @@ public:
     if (!pos.is_valid()) {
       throw std::out_of_range(error_msg::INVALID_POSITION);
     }
-    unsigned int y_pos = get_y_pos(pos.y);
-    unsigned int x_pos = get_x_pos(pos.x);
+    int y_pos = get_y_pos(pos.y);
+    int x_pos = get_x_pos(pos.x);
     return field_template[y_pos][x_pos];
   }
 
   void field_output() {
-    for (unsigned int i = 0; i < FIELD_HEIGHT; i++) {
+    for (int i = 0; i < FIELD_HEIGHT; i++) {
       if (i % 2 == 0 && i != FIELD_HEIGHT - 1)
         std::cout << 7 - (i / 2) << "  ";
       else
@@ -66,10 +66,10 @@ public:
   //   }
 
   //   // Perform the move
-  //   unsigned int old_y_pos = get_y_pos(old_pos.y);
-  //   unsigned int old_x_pos = get_x_pos(old_pos.x);
-  //   unsigned int new_y_pos = get_y_pos(new_pos.y);
-  //   unsigned int new_x_pos = get_x_pos(new_pos.x);
+  //   int old_y_pos = get_y_pos(old_pos.y);
+  //   int old_x_pos = get_x_pos(old_pos.x);
+  //   int new_y_pos = get_y_pos(new_pos.y);
+  //   int new_x_pos = get_x_pos(new_pos.x);
 
   //   field_template[old_y_pos][old_x_pos] = T;
   //   field_template[new_y_pos][new_x_pos] = active_user.marker;
@@ -92,8 +92,8 @@ public:
     validate_coordinates(pos, active_user.marker);
 
     // Remove the stone
-    unsigned int y_pos = get_y_pos(pos.y);
-    unsigned int x_pos = get_x_pos(pos.x);
+    int y_pos = get_y_pos(pos.y);
+    int x_pos = get_x_pos(pos.x);
     field_template[y_pos][x_pos] = EMPTY_FIELD;
   }
 
@@ -102,10 +102,9 @@ public:
     validate_coordinates(pos, opponent_user.marker);
 
     // Remove the stone
-    unsigned int pos_y = get_y_pos(pos.y);
-    unsigned int pos_x = get_x_pos(pos.x);
+    int pos_y = get_y_pos(pos.y);
+    int pos_x = get_x_pos(pos.x);
     field_template[pos_y][pos_x] = EMPTY_FIELD;
-    opponent_user.remove_stone();
 
     return true;
   }
@@ -116,33 +115,23 @@ public:
 
   void next_phase() {
     if (current_phase < ENDGAME)
-      current_phase = static_cast<GamePhase>(static_cast<unsigned int>(current_phase) + 1);
+      current_phase = static_cast<GamePhase>(static_cast<int>(current_phase) + 1);
   }
 
-  bool player_set_stone(User& active_user, Position& pos, bool moved = false) {
+  bool player_set_stone(User& active_user, Position& pos) {
     // Validate coordinates
-    if (!pos.is_valid())
-      throw std::out_of_range(error_msg::INVALID_POSITION);
-
-    // Check if position is empty
-    if (get_field_marker_at_position(pos) != EMPTY_FIELD) {
-      throw std::invalid_argument(error_msg::POSITION_OCCUPIED);
-    }
+    validate_coordinates(pos, EMPTY_FIELD);
 
     // Place the stone
-    unsigned int y_pos = get_y_pos(pos.y);
-    unsigned int x_pos = get_x_pos(pos.x);
+    int y_pos = get_y_pos(pos.y);
+    int x_pos = get_x_pos(pos.x);
     field_template[y_pos][x_pos] = active_user.marker;
-
-    if (!moved) {
-      active_user.set_stone();
-    }
 
     return true;
   }
 
   bool check_mill(std::array<Position, 3> mill, char marker) {
-    unsigned int counter = 0;
+    int counter = 0;
 
     for (auto pos : mill) {
       try {
@@ -177,7 +166,7 @@ public:
 
 private:
   GamePhase current_phase;
-  unsigned int stones_set;
+  int stones_set;
 
   static const int FIELD_WIDTH = 26;
   static const int FIELD_HEIGHT = 15;
@@ -200,11 +189,11 @@ private:
       "",
       "1   2   3   4   5   6   7"};
 
-  unsigned int get_y_pos(unsigned int y_pos) const {
+  int get_y_pos(int y_pos) const {
     return ((7 - (y_pos)) * 2);
   }
 
-  unsigned int get_x_pos(unsigned int x_pos) const {
+  int get_x_pos(int x_pos) const {
     return ((x_pos - 1) * 4);
   }
 };

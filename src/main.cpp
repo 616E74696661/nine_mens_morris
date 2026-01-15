@@ -25,7 +25,7 @@ int main() {
 
   init();
 
-  unsigned int iteration = 0;
+  int iteration = 0;
   while (true) {
 
     // handle a turn
@@ -57,7 +57,7 @@ Position game() {
   // check if user is a player
   if (!active_user->is_bot()) {
     f.field_output();
-    std::cout << "It's your turn, " << active_user->name << "!" << std::endl;
+    std::cout << "It's your turn, " << active_user->name << " (" << active_user->marker << ")" << std::endl;
   }
 
   std::string output;
@@ -72,13 +72,16 @@ Position game() {
     output = active_user->name + " placed a stone on Position y: " + std::to_string(new_pos.y) + ", x: " + std::to_string(new_pos.x);
   } else if (placed_stones == 9) {
     // Midgame / Endgame phase: move stones
+
+    /*
     if (!active_user->able_to_make_legal_move(f)) {
       // check if a player lost
       game_lost(*active_user);
     }
+    */
 
     std::pair<Position, Position> pos_pair;
-    bool three_stones_left = stones_left == 3;
+    bool three_stones_left = active_user->get_stones_on_board() == 3;
     pos_pair = active_user->move_marker(f, three_stones_left);
 
     output = active_user->name + " moved a stone from Position y: " + std::to_string(pos_pair.first.y) + ", x: " + std::to_string(pos_pair.first.x) +

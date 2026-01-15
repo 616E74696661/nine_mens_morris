@@ -9,9 +9,9 @@
 #include <utility>
 #include <vector>
 
-static bool is_valid(unsigned int x_pos, unsigned int y_pos);
+static bool is_valid(int x_pos, int y_pos);
 
-static std::array<std::pair<unsigned int, unsigned int>, 24> valid_positions{
+static std::array<std::pair<int, int>, 24> valid_positions{
     {{1, 1},
      {4, 1},
      {7, 1},
@@ -48,10 +48,10 @@ static std::array<std::array<int, 4>, 24> adjacency_neighbour = {{
     {4, 6, 8, -1},    // 7: (4,3) -> (4,2), (3,3), (5,3)
     {7, 12, -1, -1},  // 8: (5,3) -> (4,3), (5,4)
     {0, 10, 21, -1},  // 9: (1,4) -> (1,1), (2,4), (1,7)
-    {3, 9, 11, -1},   // 10: (2,4) -> (2,2), (1,4), (3,4)
+    {3, 9, 11, 18},   // 10: (2,4) -> (2,2), (1,4), (3,4), (2,6)
     {6, 10, 15, -1},  // 11: (3,4) -> (3,3), (2,4), (3,5)
     {8, 13, 17, -1},  // 12: (5,4) -> (5,3), (6,4), (5,5)
-    {5, 12, 14, -1},  // 13: (6,4) -> (6,2), (5,4), (7,4)
+    {5, 12, 14, 20},  // 13: (6,4) -> (6,2), (5,4), (7,4), (6,6)
     {2, 13, 23, -1},  // 14: (7,4) -> (7,1), (6,4), (7,7)
     {11, 16, -1, -1}, // 15: (3,5) -> (3,4), (4,5)
     {15, 17, 19, -1}, // 16: (4,5) -> (3,5), (5,5), (4,6)
@@ -66,14 +66,14 @@ static std::array<std::array<int, 4>, 24> adjacency_neighbour = {{
 
 struct Position {
 public:
-  unsigned int x;
-  unsigned int y;
+  int x;
+  int y;
 
   Position() {
     x = 0, y = 0;
   }
 
-  Position(unsigned int x_pos, unsigned int y_pos) {
+  Position(int x_pos, int y_pos) {
     if (!::is_valid(x_pos, y_pos)) {
       throw std::invalid_argument(error_msg::INVALID_POSITION);
     }
@@ -93,7 +93,7 @@ public:
     return ::is_valid(x, y);
   }
 
-  static int get_index(unsigned int x_pos, unsigned int y_pos) {
+  static int get_index(int x_pos, int y_pos) {
     int i = 0;
     for (const auto& p : valid_positions) {
       if (p.first == x_pos && p.second == y_pos) {
@@ -126,7 +126,7 @@ public:
     std::array<int, 4> neighbour_indexes = adjacency_neighbour.at(pos_index);
 
     // Push back valid positions
-    std::pair<unsigned int, unsigned int> pos_coord;
+    std::pair<int, int> pos_coord;
     for (auto index : neighbour_indexes) {
       if (index != -1) {
         pos_coord = valid_positions.at(index);
@@ -139,13 +139,13 @@ public:
 
 static std::vector<Position> get_valid_positions() {
   std::vector<Position> positions;
-  for (std::pair<unsigned int, unsigned int> pos_pair : valid_positions) {
+  for (std::pair<int, int> pos_pair : valid_positions) {
     positions.push_back(Position(pos_pair.first, pos_pair.second));
   }
   return positions;
 }
 
-static bool is_valid(unsigned int x_pos, unsigned int y_pos) {
+static bool is_valid(int x_pos, int y_pos) {
   for (const auto& p : valid_positions) {
     if (p.first == x_pos && p.second == y_pos) {
       return true;
@@ -159,7 +159,7 @@ static Position get_random_position() {
   std::mt19937 gen(rd());
   std::uniform_int_distribution<> dist(0, valid_positions.size() - 1);
 
-  unsigned int randomNumber = (unsigned int)dist(gen);
+  int randomNumber = (int)dist(gen);
   return Position{valid_positions[randomNumber].first,
                   valid_positions[randomNumber].second};
 }

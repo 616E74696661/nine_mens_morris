@@ -7,7 +7,7 @@
 
 class Field; // forward declaration, else clangd error
 
-static unsigned int num_players = 0;
+static int num_players = 0;
 
 class User {
 private:
@@ -32,9 +32,15 @@ public:
   User(std::string name) : name(name) {
     num_players++;
     define_marker();
+    stones_set = 0;
+    stones_removed = 0;
   }
 
   bool able_to_make_legal_move(Field& f);
+
+  int get_stones_on_board() {
+    return stones_set - stones_removed;
+  }
 
   int get_stones_set() {
     return stones_set;
@@ -44,7 +50,7 @@ public:
     return stones_removed;
   }
 
-  void set_stone() {
+  void __set_stone() {
     stones_set++;
   }
 
@@ -54,7 +60,7 @@ public:
 
   bool lost(Field& f);
 
-  virtual Position place_marker(Field& f, bool moved = false) = 0;
+  virtual Position place_marker(Field& f) = 0;
 
   virtual std::pair<Position, Position> move_marker(Field& f, bool three_stones_left) = 0;
 
