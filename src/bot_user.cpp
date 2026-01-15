@@ -109,7 +109,7 @@ public:
 
   Position place_marker(Field& f) override {
 
-    std::cout << ">>> How many stones do i currently have on the board: " << get_stones_on_board() << std::endl;
+    std::cout << ">>> Set: " << get_stones_set() << " Removed: " << get_stones_removed() << " Board: " << get_stones_on_board() << std::endl;
 
     std::pair<Mill, Position> mill_and_pos;
     Position pos;
@@ -118,7 +118,6 @@ public:
       mill_and_pos = Mills::check_potential_mills(f, opponent_marker);
       pos = mill_and_pos.second;
       if (pos.is_valid() && f.player_set_stone(*this, pos)) {
-        __set_stone();
         return pos;
       }
 
@@ -126,7 +125,6 @@ public:
       mill_and_pos = Mills::check_potential_mills(f, this->marker);
       pos = mill_and_pos.second;
       if (pos.is_valid() && f.player_set_stone(*this, pos)) {
-        __set_stone();
         return pos;
       }
     } catch (const std::exception& e) {
@@ -137,8 +135,9 @@ public:
     while (true) {
       try {
         pos = get_random_position();
-        if (f.player_set_stone(*this, pos))
+        if (f.player_set_stone(*this, pos)) {
           return pos;
+        }
       } catch (const std::exception& e) {
         std::cout << e.what() << std::endl;
       }
@@ -149,6 +148,7 @@ public:
   }
 
   std::pair<Position, Position> move_marker(Field& f, bool three_stones_left) override {
+    std::cout << ">>> Set: " << get_stones_set() << " Removed: " << get_stones_removed() << " Board: " << get_stones_on_board() << std::endl;
 
     // Get move to make
     std::pair<Position, Position> move = get_move(f, three_stones_left);

@@ -50,7 +50,7 @@ public:
     return stones_removed;
   }
 
-  void __set_stone() {
+  void set_stone() {
     stones_set++;
   }
 

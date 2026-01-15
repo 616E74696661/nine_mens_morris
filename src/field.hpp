@@ -126,7 +126,7 @@ public:
     int y_pos = get_y_pos(pos.y);
     int x_pos = get_x_pos(pos.x);
     field_template[y_pos][x_pos] = active_user.marker;
-
+    active_user.set_stone();
     return true;
   }
 

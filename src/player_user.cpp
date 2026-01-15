@@ -24,7 +24,6 @@ public:
         int x_pos = Helper::read_uint("x: ");
         Position pos(x_pos, y_pos);
         if (f.player_set_stone(*this, pos)) {
-          __set_stone();
           return pos;
         }
       } catch (const std::exception& e) {
@@ -53,6 +52,8 @@ public:
   }
 
   std::pair<Position, Position> move_marker(Field& f, bool three_stones_left) override {
+    std::cout << ">>> Set: " << get_stones_set() << " Removed: " << get_stones_removed() << " Board: " << get_stones_on_board() << std::endl;
+
     while (true) {
       // select stone to move
       Position* old_pos;
