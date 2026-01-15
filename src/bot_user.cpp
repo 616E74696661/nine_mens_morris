@@ -160,54 +160,6 @@ public:
     f.player_set_stone(*this, new_pos);
 
     return move;
-
-    /*
-    try {
-      // try to complete own potential mill
-      std::pair<Mill, Position> mill_and_pos = Mills::check_potential_mills(f, this->marker);
-      Position target_pos = mill_and_pos.second;
-      if (target_pos.is_valid()) {
-        if (!three_stones_left) {
-          std::vector<Position*> neighbours = target_pos.get_adjacent_positions();
-          for (auto neighbour : neighbours) {
-            if (f.get_field_marker_at_position(*neighbour) == this->marker) {
-              // remove stone from current position
-              if (f.player_remove_stone(*this, *neighbour)) {
-                // try to place at target position
-                if (f.player_set_stone(*this, target_pos, true))
-                  return std::make_pair(*neighbour, target_pos);
-                // rollback if placement failed
-                f.player_set_stone(*this, *neighbour, true);
-              }
-            }
-          }
-        } else {
-          // TODO
-        }
-      }
-      // fallback: random move
-      int retries = 10;
-      while (retries-- > 0) {
-        Position from_pos = get_random_position();
-        Position to_pos = get_random_position();
-        // check if from_pos is our stone
-        if (f.get_field_marker_at_position(from_pos) != this->marker)
-          continue;
-        // check adjacency constraint (unless we can jump with 3 stones)
-        if (!three_stones_left && !from_pos.is_adjacent_position(from_pos, to_pos))
-          continue;
-        // try the move
-        if (f.player_remove_stone(*this, from_pos))
-          if (f.player_set_stone(*this, to_pos, true))
-            return std::make_pair(from_pos, to_pos);
-        // rollback
-        f.player_set_stone(*this, from_pos, true);
-      }
-    } catch (const std::exception& e) {
-      std::cout << e.what() << std::endl;
-    }
-    return std::pair<Position, Position>(Position(), Position());
-  */
   }
 
   Position remove_opponent_marker(Field& f, User& other) override {
