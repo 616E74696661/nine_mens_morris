@@ -51,35 +51,35 @@ public:
     stones_set++;
   }
 
-  bool player_move_stone(User& active_player, Position& old_pos, Position& new_pos, bool three_stones_left = false) {
-    // Validate coordinates first
-    if (!valid_coordinates(old_pos.x, old_pos.y))
-      throw std::out_of_range(error_msg::INVALID_POSITION);
-    if (!valid_coordinates(new_pos.x, new_pos.y))
-      throw std::out_of_range(error_msg::INVALID_POSITION);
+  // bool player_move_stone(User& active_player, Position& old_pos, Position& new_pos, bool three_stones_left = false) {
+  //   // Validate coordinates first
+  //   if (!valid_coordinates(old_pos.x, old_pos.y))
+  //     throw std::out_of_range(error_msg::INVALID_POSITION);
+  //   if (!valid_coordinates(new_pos.x, new_pos.y))
+  //     throw std::out_of_range(error_msg::INVALID_POSITION);
 
-    // Check if old position has player's stone
-    if (get_field_marker_at_position(old_pos) != active_player.marker) {
-      throw std::invalid_argument(error_msg::INVALID_MOVE);
-    }
-    if (!three_stones_left && !Position::is_neighbour(old_pos, new_pos))
-      throw std::invalid_argument(error_msg::NOT_NEIGHBOUR);
-    // Check if new position is empty
-    if (get_field_marker_at_position(new_pos) != T) {
-      throw std::invalid_argument(error_msg::POSITION_OCCUPIED);
-    }
+  //   // Check if old position has player's stone
+  //   if (get_field_marker_at_position(old_pos) != active_player.marker) {
+  //     throw std::invalid_argument(error_msg::INVALID_MOVE);
+  //   }
+  //   if (!three_stones_left && !Position::is_neighbour(old_pos, new_pos))
+  //     throw std::invalid_argument(error_msg::NOT_NEIGHBOUR);
+  //   // Check if new position is empty
+  //   if (get_field_marker_at_position(new_pos) != T) {
+  //     throw std::invalid_argument(error_msg::POSITION_OCCUPIED);
+  //   }
 
-    // Perform the move
-    unsigned int old_y_pos = get_y_pos(old_pos.y);
-    unsigned int old_x_pos = get_x_pos(old_pos.x);
-    unsigned int new_y_pos = get_y_pos(new_pos.y);
-    unsigned int new_x_pos = get_x_pos(new_pos.x);
+  //   // Perform the move
+  //   unsigned int old_y_pos = get_y_pos(old_pos.y);
+  //   unsigned int old_x_pos = get_x_pos(old_pos.x);
+  //   unsigned int new_y_pos = get_y_pos(new_pos.y);
+  //   unsigned int new_x_pos = get_x_pos(new_pos.x);
 
-    field_template[old_y_pos][old_x_pos] = T;
-    field_template[new_y_pos][new_x_pos] = active_player.marker;
+  //   field_template[old_y_pos][old_x_pos] = T;
+  //   field_template[new_y_pos][new_x_pos] = active_player.marker;
 
-    return true;
-  }
+  //   return true;
+  // }
 
   bool player_remove_stone(User& active_player, Position& pos) {
     // Validate coordinates

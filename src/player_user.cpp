@@ -68,23 +68,23 @@ public:
             Position new_pos = Position(new_x_pos, new_y_pos);
 
             // Check adjacency constraint if not in endgame
-            if (!three_stones_left && !Position::is_neighbour(pos, new_pos)) {
-              throw std::invalid_argument(error_msg::INVALID_SELECTION);
-            }
-
-            bool success = f.player_set_stone(*this, new_pos, true);
-            if (success) {
-              return std::make_pair(pos, new_pos);
-            }
+            // if (!three_stones_left && !Position::is_neighbour(pos, new_pos)) {
+            //   throw std::invalid_argument(error_msg::INVALID_SELECTION);
+            // }
+            if (three_stones_left || Position::is_neighbour(pos, new_pos))
+              if (f.player_set_stone(*this, new_pos, true)) {
+                return std::pair<Position, Position>(pos, new_pos);
+              }
+            throw std::invalid_argument(error_msg::INVALID_SELECTION);
 
           } catch (const std::exception& e) {
             std::cout << e.what() << std::endl;
-            // Rollback: put the stone back - wrap in try-catch to handle invalid pos
+            // rollback: put the stone back; wrap in try-catch to handle invalid pos
             try {
               f.player_set_stone(*this, pos, true);
             } catch (...) {
-              // If rollback fails, the stone is already removed from the field
-              // This shouldn't happen in normal gameplay
+              // if rollback fails, the stone is already removed from the field
+              // this shouldn't happen in normal gameplay
             }
           }
         }

@@ -54,9 +54,8 @@ public:
       std::cout << e.what() << std::endl;
     }
 
-    // Fallback: random placement
-    int retries = 10;
-    while (retries-- > 0) {
+    // fallback: random placement
+    while (true) {
       try {
         pos = get_random_position();
         if (f.player_set_stone(*this, pos, moved))
@@ -83,18 +82,22 @@ public:
       std::pair<Mill, Position> mill_and_pos = Mills::check_potential_mills(f, this->marker);
       Position target_pos = mill_and_pos.second;
       if (target_pos.is_valid()) {
-        std::vector<Position*> neighbours = target_pos.get_neighbours();
-        for (auto neighbour : neighbours) {
-          if (f.get_field_marker_at_position(*neighbour) == this->marker) {
-            // remove stone from current position
-            if (f.player_remove_stone(*this, *neighbour)) {
-              // try to place at target position
-              if (f.player_set_stone(*this, target_pos, true))
-                return std::make_pair(*neighbour, target_pos);
-              // rollback if placement failed
-              f.player_set_stone(*this, *neighbour, true);
+        if (!three_stones_left) {
+          std::vector<Position*> neighbours = target_pos.get_neighbours();
+          for (auto neighbour : neighbours) {
+            if (f.get_field_marker_at_position(*neighbour) == this->marker) {
+              // remove stone from current position
+              if (f.player_remove_stone(*this, *neighbour)) {
+                // try to place at target position
+                if (f.player_set_stone(*this, target_pos, true))
+                  return std::make_pair(*neighbour, target_pos);
+                // rollback if placement failed
+                f.player_set_stone(*this, *neighbour, true);
+              }
             }
           }
+        } else {
+          // TODO
         }
       }
       // fallback: random move
