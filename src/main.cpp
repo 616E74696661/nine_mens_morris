@@ -50,12 +50,6 @@ void init() {
 
 void check_game_over(User& active_user) {
   
-    /*
-    if (!active_user->able_to_make_legal_move(f)) {
-      // check if a player lost
-      game_lost(*active_user);
-    }
-    */
     if (f.available_to_move(active_user)) {
       game_lost(active_user);
     }
