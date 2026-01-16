@@ -50,7 +50,7 @@ void init() {
 
 void check_game_over(User& active_user) {
   
-    if (f.available_to_move(active_user)) {
+  if (!f.available_to_move(active_user)) {
       game_lost(active_user);
     }
 
