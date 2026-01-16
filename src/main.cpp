@@ -20,7 +20,7 @@ Field f;
 Position pos;
 std::vector<User*> players;
 User* active_user = nullptr;
-int MAX_NUM_STONES = 4; // change to 9 
+int MAX_NUM_STONES = 9; // change to 9 
 
 int main() {
 
