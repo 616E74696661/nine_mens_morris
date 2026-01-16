@@ -48,6 +48,25 @@ void init() {
   std::cout << game_text::WELCOME << std::endl;
 }
 
+void check_game_over(User& active_user) {
+  
+    /*
+    if (!active_user->able_to_make_legal_move(f)) {
+      // check if a player lost
+      game_lost(*active_user);
+    }
+    */
+    if (f.available_to_move(active_user)) {
+      game_lost(active_user);
+    }
+
+
+    if (active_user.get_stones_on_board() < 3) {
+      game_lost(active_user);
+    }
+}
+
+
 Position game() {
 
   // ensure active player is set
@@ -72,23 +91,17 @@ Position game() {
                 " Board: " << active_user->get_stones_on_board() << std::endl;
 
 
-  if (placed_stones < MAX_NUM_STONES) { //@TODOf CHANGE BACK 4->9
+  if (placed_stones < MAX_NUM_STONES) { 
     // Opening phase: place stones
     new_pos = active_user->place_marker(f);
     output = active_user->name + " placed a stone on Position y: " + std::to_string(new_pos.y) + ", x: " + std::to_string(new_pos.x);
-  } else if (placed_stones == MAX_NUM_STONES) { //@TODO CHANGE BACK 4->9
+  } else if (placed_stones == MAX_NUM_STONES) {
     // Midgame / Endgame phase: move stones
 
-    /*
-    if (!active_user->able_to_make_legal_move(f)) {
-      // check if a player lost
-      game_lost(*active_user);
-    }
-    */
-    if (active_user->get_stones_on_board() < 3) {
-      game_lost(*active_user);
-    }
+    // Check game over
+    check_game_over(*active_user);
 
+    // Move stone
     std::pair<Position, Position> pos_pair;
     bool three_stones_left = active_user->get_stones_on_board() == 3;
     pos_pair = active_user->move_marker(f, three_stones_left);

@@ -33,6 +33,19 @@ public:
     return field_template[y_pos][x_pos];
   }
 
+  bool available_to_move(User& active_user) {
+    std::vector<Position> stones = get_all_players_stones(active_user.marker);
+
+    for (auto &pos : stones) {
+      for (auto & adj : pos.get_adjacent_positions()) {
+        if (get_field_marker_at_position(*adj)== EMPTY_FIELD) {
+           return true;
+        }
+      }
+    }
+    return false;
+  }
+
   void field_output() {
     for (int i = 0; i < FIELD_HEIGHT; i++) {
       if (i % 2 == 0 && i != FIELD_HEIGHT - 1)
