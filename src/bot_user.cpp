@@ -34,13 +34,15 @@ private:
   //     return Position(0, 0);
   // }
 
-  Position select_stone_to_move(Field& f, Position* target_pos, Mill* mill, bool* jump_allowed) {
+  Position select_stone_to_move(Field& f, Position* target_pos, Mill* mill, bool jump_allowed) {
+
+    std::cout << "Jump allowed: " << jump_allowed << std::endl; 
 
     if (jump_allowed) {
       // select stone which is not included within the potential mill
       for (auto pos : f.get_all_players_stones(marker)) {
-        if (!Mills::pos_is_part_of_mill(*target_pos, *mill)) {
-          return *target_pos;
+        if (!Mills::pos_is_part_of_mill(pos, *mill)) {
+          return pos;
         }
       }
     }
@@ -50,25 +52,35 @@ private:
     for (auto pos : adj_positions) {
       if (!Mills::pos_is_part_of_mill(*pos, *mill) && f.get_field_marker_at_position(*pos) == marker) {
         // Position is not part of the mill and occupied by this bot
-        return *pos;
+          return *pos;
       }
     }
 
-    // Programm should not be able to get here
-    throw "Reached unexpected point in code";
+    // No stone found to block the marker -> select random to move random
+    // Return values ändern -> erkennbar, ob mill geblockt werden kann
+    // return invalid Position, False
+    std::cout << "Retuning invalid position" << std::endl;
+    return Position();
   }
 
   std::pair<Position, Position> get_move(Field& f, bool jump_allowed) {
+
     // try to complete own potential mill
     std::pair<Mill, Position> mill_and_pos = Mills::check_potential_mills(f, this->marker);
     Mill target_mill = mill_and_pos.first;
     Position target_pos = mill_and_pos.second;
 
     Position moveable_stone;
+    bool able_to_block_or_complete_mill = false;
+
     if (target_pos.is_valid()) {
-      moveable_stone = select_stone_to_move(f, &target_pos, &target_mill, &jump_allowed);
-      f.validate_coordinates(moveable_stone, marker);
-      return std::pair<Position, Position>(moveable_stone, target_pos);
+      std::cout << "Trying to complete own mill" << std::endl;
+      moveable_stone = select_stone_to_move(f, &target_pos, &target_mill, jump_allowed);
+
+      if (moveable_stone.is_valid()) {
+        f.validate_coordinates(moveable_stone, marker);
+        return std::pair<Position, Position>(moveable_stone, target_pos);
+      }
     }
 
     // try to block opponents potential mill
@@ -77,17 +89,21 @@ private:
     target_pos = mill_and_pos.second;
 
     if (target_pos.is_valid()) {
-      moveable_stone = select_stone_to_move(f, &target_pos, &target_mill, &jump_allowed);
-      f.validate_coordinates(moveable_stone, marker);
-      return std::pair<Position, Position>(moveable_stone, target_pos);
+      std::cout << "Trying to block opponent's mill" << std::endl;
+      moveable_stone = select_stone_to_move(f, &target_pos, &target_mill, jump_allowed);
+      if (moveable_stone.is_valid()) {
+        f.validate_coordinates(moveable_stone, marker);
+        return std::pair<Position, Position>(moveable_stone, target_pos);
+      }
     }
 
+    // Random move
+    std::cout << "Random move"<< std::endl;
     if (jump_allowed) {
       // return random stone to jump to an empty position
       Position old_pos = f.get_all_players_stones(marker)[0];
       Position new_pos = f.get_all_players_stones('#')[0];
       return std::pair<Position, Position>(old_pos, new_pos);
-
     } else {
       // Search for stone with empty neighbour
       std::vector<Position> own_stones = f.get_all_players_stones(marker);
@@ -101,7 +117,7 @@ private:
     }
 
     // Programm should not be able to get here
-    throw "Reached unexpected point in code";
+    throw std::runtime_error("Reached unexpected point in code");
   }
 
 public:
@@ -109,7 +125,7 @@ public:
 
   Position place_marker(Field& f) override {
 
-    std::cout << ">>> Set: " << get_stones_set() << " Removed: " << get_stones_removed() << " Board: " << get_stones_on_board() << std::endl;
+    set_stone();
 
     std::pair<Mill, Position> mill_and_pos;
     Position pos;
@@ -148,10 +164,14 @@ public:
   }
 
   std::pair<Position, Position> move_marker(Field& f, bool three_stones_left) override {
-    std::cout << ">>> Set: " << get_stones_set() << " Removed: " << get_stones_removed() << " Board: " << get_stones_on_board() << std::endl;
-
     // Get move to make
-    std::pair<Position, Position> move = get_move(f, three_stones_left);
+    std::pair<Position, Position> move;
+    try {
+      move = get_move(f, three_stones_left);
+    }
+    catch(std::exception& e) {
+      std::cout << e.what() << std::endl;
+    }
     Position old_pos = move.first;
     Position new_pos = move.second;
 

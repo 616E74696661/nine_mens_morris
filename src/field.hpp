@@ -27,6 +27,7 @@ public:
     if (!pos.is_valid()) {
       throw std::out_of_range(error_msg::INVALID_POSITION);
     }
+    
     int y_pos = get_y_pos(pos.y);
     int x_pos = get_x_pos(pos.x);
     return field_template[y_pos][x_pos];
@@ -126,7 +127,6 @@ public:
     int y_pos = get_y_pos(pos.y);
     int x_pos = get_x_pos(pos.x);
     field_template[y_pos][x_pos] = active_user.marker;
-    active_user.set_stone();
     return true;
   }
 
@@ -155,12 +155,6 @@ public:
         players_positions.push_back(pos);
       }
     }
-
-    // Check for invalid values
-    if (sizeof(players_positions) < 3 || sizeof(players_positions) > 9) {
-      throw error_msg::INVALID_NUMBER_OF_STONES;
-    }
-
     return players_positions;
   }
 

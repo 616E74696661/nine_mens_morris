@@ -20,6 +20,7 @@ Field f;
 Position pos;
 std::vector<User*> players;
 User* active_user = nullptr;
+int MAX_NUM_STONES = 4; // change to 9 
 
 int main() {
 
@@ -66,11 +67,16 @@ Position game() {
   int placed_stones = active_user->get_stones_set();
   int stones_left = placed_stones - active_user->get_stones_removed();
 
-  if (placed_stones < 9) {
+  std::cout << ">>> Set: " << active_user->get_stones_set() << 
+                " Removed: " << active_user->get_stones_removed() << 
+                " Board: " << active_user->get_stones_on_board() << std::endl;
+
+
+  if (placed_stones < MAX_NUM_STONES) { //@TODOf CHANGE BACK 4->9
     // Opening phase: place stones
     new_pos = active_user->place_marker(f);
     output = active_user->name + " placed a stone on Position y: " + std::to_string(new_pos.y) + ", x: " + std::to_string(new_pos.x);
-  } else if (placed_stones == 9) {
+  } else if (placed_stones == MAX_NUM_STONES) { //@TODO CHANGE BACK 4->9
     // Midgame / Endgame phase: move stones
 
     /*
@@ -79,6 +85,9 @@ Position game() {
       game_lost(*active_user);
     }
     */
+    if (active_user->get_stones_on_board() < 3) {
+      game_lost(*active_user);
+    }
 
     std::pair<Position, Position> pos_pair;
     bool three_stones_left = active_user->get_stones_on_board() == 3;
@@ -87,9 +96,15 @@ Position game() {
     output = active_user->name + " moved a stone from Position y: " + std::to_string(pos_pair.first.y) + ", x: " + std::to_string(pos_pair.first.x) +
              " to Position y: " + std::to_string(pos_pair.second.y) + ", x: " + std::to_string(pos_pair.second.x);
     new_pos = pos_pair.second;
+
   } else {
     throw std::range_error("FATAL ERROR. PLAYER PLAYED MORE THAN 9 STONES.");
   }
+
+  std::cout << ">>> Set: " << active_user->get_stones_set() << 
+                " Removed: " << active_user->get_stones_removed() << 
+                " Board: " << active_user->get_stones_on_board() << std::endl;
+
 
   // Helper::clear_console();
   std::cout << output << std::endl;

@@ -15,7 +15,7 @@ public:
   }
 
   Position place_marker(Field& f) override {
-    std::cout << ">>> Set: " << get_stones_set() << " Removed: " << get_stones_removed() << " Board: " << get_stones_on_board() << std::endl;
+    set_stone();
 
     while (true) {
       std::cout << "Select stone position:" << std::endl;
@@ -52,7 +52,6 @@ public:
   }
 
   std::pair<Position, Position> move_marker(Field& f, bool three_stones_left) override {
-    std::cout << ">>> Set: " << get_stones_set() << " Removed: " << get_stones_removed() << " Board: " << get_stones_on_board() << std::endl;
 
     while (true) {
       // select stone to move

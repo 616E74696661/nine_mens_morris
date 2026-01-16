@@ -141,8 +141,7 @@ static std::vector<Position> get_valid_positions() {
   std::vector<Position> positions;
   for (std::pair<int, int> pos_pair : valid_positions) {
     positions.push_back(Position(pos_pair.first, pos_pair.second));
-  }
-  return positions;
+  }  return positions;
 }
 
 static bool is_valid(int x_pos, int y_pos) {
