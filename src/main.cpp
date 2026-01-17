@@ -76,7 +76,6 @@ Position game() {
   Position new_pos;
 
   int placed_stones = active_user->get_stones_set();
-  int stones_left = placed_stones - active_user->get_stones_removed();
 
   std::cout << ">>> Set: " << active_user->get_stones_set() << " Removed: " << active_user->get_stones_removed() << " Board: " << active_user->get_stones_on_board() << std::endl;
 
