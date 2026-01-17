@@ -23,16 +23,17 @@ public:
         int y_pos = Helper::read_uint("y: ");
         int x_pos = Helper::read_uint("x: ");
         Position pos(x_pos, y_pos);
-        if (f.player_set_stone(*this, pos)) {
-          return pos;
-        }
+
+        f.player_set_stone(pos, marker);
+        return pos;
+
       } catch (const std::exception& e) {
         std::cout << e.what() << std::endl;
       }
     }
   }
 
-  Position remove_opponent_marker(Field& f, User& other) override {
+  Position remove_opponent_marker(Field& f) override {
     std::cout << "You formed a mill! Select an opponent's marker to remove:" << std::endl;
 
     while (true) {
@@ -40,9 +41,9 @@ public:
         int y_pos = Helper::read_uint("y: ");
         int x_pos = Helper::read_uint("x: ");
         Position pos(x_pos, y_pos);
-        bool success = f.opponent_remove_stone(this->marker, pos, other);
-        if (success) {
-          other.remove_stone();
+
+        if (pos.is_valid()) {
+          f.player_remove_stone(pos, opponent_marker);
           return pos;
         }
       } catch (const std::exception& e) {
@@ -63,7 +64,7 @@ public:
         int x_pos = Helper::read_uint("x: ");
         Position pos = Position(x_pos, y_pos);
 
-        f.player_remove_stone(*this, pos);
+        f.player_remove_stone(pos, marker);
         old_pos = &pos;
 
       } catch (const std::exception& e) {
@@ -82,7 +83,7 @@ public:
         Position new_pos = Position(x_pos, y_pos);
 
         if (three_stones_left || Position::is_adjacent_position(*old_pos, new_pos)) {
-          f.player_set_stone(*this, new_pos);
+          f.player_set_stone(new_pos, marker);
           return std::pair<Position, Position>(*old_pos, new_pos);
         }
         throw std::invalid_argument(error_msg::INVALID_SELECTION);
@@ -92,7 +93,7 @@ public:
 
         // Rollback necessary
         try {
-          f.player_set_stone(*this, *old_pos);
+          f.player_set_stone(*old_pos, marker);
         } catch (const std::exception& e) {
           std::cout << "Error at rollback during player's move. Quitting program" << std::endl;
           std::exit(1);

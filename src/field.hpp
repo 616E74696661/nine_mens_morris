@@ -22,12 +22,13 @@ public:
     MIDGAME = 1,
     ENDGAME = 2
   };
+  static const char EMPTY_FIELD = '#';
 
   char get_field_marker_at_position(Position& pos) {
     if (!pos.is_valid()) {
       throw std::out_of_range(error_msg::INVALID_POSITION);
     }
-    
+
     int y_pos = get_y_pos(pos.y);
     int x_pos = get_x_pos(pos.x);
     return field_template[y_pos][x_pos];
@@ -36,10 +37,10 @@ public:
   bool available_to_move(User& active_user) {
     std::vector<Position> stones = get_all_players_stones(active_user.marker);
 
-    for (auto &pos : stones) {
-      for (auto & adj : pos.get_adjacent_positions()) {
-        if (get_field_marker_at_position(*adj)== EMPTY_FIELD) {
-           return true;
+    for (auto& pos : stones) {
+      for (auto& adj : pos.get_adjacent_positions()) {
+        if (get_field_marker_at_position(*adj) == EMPTY_FIELD) {
+          return true;
         }
       }
     }
@@ -101,9 +102,9 @@ public:
     }
   }
 
-  void player_remove_stone(User& active_user, Position& pos) {
+  void player_remove_stone(Position& pos, char marker) {
     // Validate coordinates
-    validate_coordinates(pos, active_user.marker);
+    validate_coordinates(pos, marker);
 
     // Remove the stone
     int y_pos = get_y_pos(pos.y);
@@ -111,16 +112,14 @@ public:
     field_template[y_pos][x_pos] = EMPTY_FIELD;
   }
 
-  bool opponent_remove_stone(char active_user_marker, Position& pos, User& opponent_user) {
-    // Validate coordinates (must be opponent's marker)
-    validate_coordinates(pos, opponent_user.marker);
+  void player_set_stone(Position& pos, char marker) {
+    // Validate coordinates
+    validate_coordinates(pos, EMPTY_FIELD);
 
-    // Remove the stone
-    int pos_y = get_y_pos(pos.y);
-    int pos_x = get_x_pos(pos.x);
-    field_template[pos_y][pos_x] = EMPTY_FIELD;
-
-    return true;
+    // Place the stone
+    int y_pos = get_y_pos(pos.y);
+    int x_pos = get_x_pos(pos.x);
+    field_template[y_pos][x_pos] = marker;
   }
 
   GamePhase get_current_phase() const {
@@ -130,17 +129,6 @@ public:
   void next_phase() {
     if (current_phase < ENDGAME)
       current_phase = static_cast<GamePhase>(static_cast<int>(current_phase) + 1);
-  }
-
-  bool player_set_stone(User& active_user, Position& pos) {
-    // Validate coordinates
-    validate_coordinates(pos, EMPTY_FIELD);
-
-    // Place the stone
-    int y_pos = get_y_pos(pos.y);
-    int x_pos = get_x_pos(pos.x);
-    field_template[y_pos][x_pos] = active_user.marker;
-    return true;
   }
 
   bool check_mill(std::array<Position, 3> mill, char marker) {
@@ -177,7 +165,6 @@ private:
 
   static const int FIELD_WIDTH = 26;
   static const int FIELD_HEIGHT = 15;
-  static const char EMPTY_FIELD = '#';
 
   char field_template[FIELD_HEIGHT][FIELD_WIDTH] = {
       "#-----------#-----------#",

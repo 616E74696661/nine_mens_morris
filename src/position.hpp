@@ -4,12 +4,11 @@
 #include "constants/error_messages.hpp"
 #include <algorithm>
 #include <array>
-#include <random>
+#include <stdexcept>
 #include <tuple>
 #include <utility>
 #include <vector>
 
-static bool is_valid(int x_pos, int y_pos);
 
 static std::array<std::pair<int, int>, 24> valid_positions{
     {{1, 1},
@@ -65,6 +64,16 @@ static std::array<std::array<int, 4>, 24> adjacency_neighbour = {{
 }};
 
 struct Position {
+private:
+  bool is_valid(int x_pos, int y_pos) {
+    for (const auto& p : valid_positions) {
+      if (p.first == x_pos && p.second == y_pos) {
+        return true;
+      }
+    }
+    return false;
+  }
+
 public:
   int x;
   int y;
@@ -74,7 +83,7 @@ public:
   }
 
   Position(int x_pos, int y_pos) {
-    if (!::is_valid(x_pos, y_pos)) {
+    if (!is_valid(x_pos, y_pos)) {
       throw std::invalid_argument(error_msg::INVALID_POSITION);
     }
     x = x_pos, y = y_pos;
@@ -85,12 +94,13 @@ public:
   bool operator==(const Position& other) const {
     return x == other.x && y == other.y;
   }
+
   bool operator<(const Position& other) const {
     return std::tie(x, y) < std::tie(other.x, other.y);
   }
 
   bool is_valid() {
-    return ::is_valid(x, y);
+    return is_valid(x, y);
   }
 
   static int get_index(int x_pos, int y_pos) {
@@ -141,26 +151,8 @@ static std::vector<Position> get_valid_positions() {
   std::vector<Position> positions;
   for (std::pair<int, int> pos_pair : valid_positions) {
     positions.push_back(Position(pos_pair.first, pos_pair.second));
-  }  return positions;
-}
-
-static bool is_valid(int x_pos, int y_pos) {
-  for (const auto& p : valid_positions) {
-    if (p.first == x_pos && p.second == y_pos) {
-      return true;
-    }
   }
-  return false;
-}
-
-static Position get_random_position() {
-  std::random_device rd;
-  std::mt19937 gen(rd());
-  std::uniform_int_distribution<> dist(0, valid_positions.size() - 1);
-
-  int randomNumber = (int)dist(gen);
-  return Position{valid_positions[randomNumber].first,
-                  valid_positions[randomNumber].second};
+  return positions;
 }
 
 #endif // POSITION_HPP

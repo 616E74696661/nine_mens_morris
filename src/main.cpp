@@ -20,7 +20,7 @@ Field f;
 Position pos;
 std::vector<User*> players;
 User* active_user = nullptr;
-int MAX_NUM_STONES = 9; // change to 9 
+int MAX_NUM_STONES = 9; // change to 9
 
 int main() {
 
@@ -49,17 +49,15 @@ void init() {
 }
 
 void check_game_over(User& active_user) {
-  
+
   if (!f.available_to_move(active_user)) {
-      game_lost(active_user);
-    }
+    game_lost(active_user);
+  }
 
-
-    if (active_user.get_stones_on_board() < 3) {
-      game_lost(active_user);
-    }
+  if (active_user.get_stones_on_board() < 3) {
+    game_lost(active_user);
+  }
 }
-
 
 Position game() {
 
@@ -80,12 +78,9 @@ Position game() {
   int placed_stones = active_user->get_stones_set();
   int stones_left = placed_stones - active_user->get_stones_removed();
 
-  std::cout << ">>> Set: " << active_user->get_stones_set() << 
-                " Removed: " << active_user->get_stones_removed() << 
-                " Board: " << active_user->get_stones_on_board() << std::endl;
+  std::cout << ">>> Set: " << active_user->get_stones_set() << " Removed: " << active_user->get_stones_removed() << " Board: " << active_user->get_stones_on_board() << std::endl;
 
-
-  if (placed_stones < MAX_NUM_STONES) { 
+  if (placed_stones < MAX_NUM_STONES) {
     // Opening phase: place stones
     new_pos = active_user->place_marker(f);
     output = active_user->name + " placed a stone on Position y: " + std::to_string(new_pos.y) + ", x: " + std::to_string(new_pos.x);
@@ -108,10 +103,7 @@ Position game() {
     throw std::range_error("FATAL ERROR. PLAYER PLAYED MORE THAN 9 STONES.");
   }
 
-  std::cout << ">>> Set: " << active_user->get_stones_set() << 
-                " Removed: " << active_user->get_stones_removed() << 
-                " Board: " << active_user->get_stones_on_board() << std::endl;
-
+  std::cout << ">>> Set: " << active_user->get_stones_set() << " Removed: " << active_user->get_stones_removed() << " Board: " << active_user->get_stones_on_board() << std::endl;
 
   // Helper::clear_console();
   std::cout << output << std::endl;
@@ -124,12 +116,15 @@ Position game() {
  * @param f
  * @param pos position where a stone was placed
  */
-void check_for_closed_mill(Field& f, Position& pos, User& active_user) {
+void check_for_closed_mill(Field& field, Position& pos, User& active_user) {
   // Check for mills
-  bool mill_closed = Mills::check_mill(pos, active_user.marker, f);
+  bool mill_closed = Mills::check_mill(pos, active_user.marker, field);
   // If mill is closed, remove opponent's stone
   if (mill_closed) {
-    Position removed_stone = active_user.remove_opponent_marker(f, get_other_player(active_user, players));
+    Position removed_stone = active_user.remove_opponent_marker(field);
+
+    get_other_player(active_user, players).remove_stone();
+
     std::cout << active_user.name << " formed a mill -> removed stone of " << get_other_player(active_user, players).name
               << " on Position y: " << removed_stone.y << "x: " << removed_stone.x << std::endl;
   } else

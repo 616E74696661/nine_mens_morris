@@ -13,11 +13,14 @@ class User {
 private:
   int stones_set;
   int stones_removed; // stones_set minus player stones on the board
+
   void define_marker() {
     if (num_players == 1) {
       this->marker = 'O';
+      this->opponent_marker = 'X';
     } else if (num_players == 2) {
       this->marker = 'X';
+      this->opponent_marker = 'O';
     } else {
       throw std::logic_error(error_msg::TOO_MANY_PLAYERS);
     }
@@ -28,7 +31,9 @@ protected:
 
 public:
   char marker;
+  char opponent_marker;
   std::string name;
+
   User(std::string name) : name(name) {
     num_players++;
     define_marker();
@@ -64,7 +69,7 @@ public:
 
   virtual std::pair<Position, Position> move_marker(Field& f, bool three_stones_left) = 0;
 
-  virtual Position remove_opponent_marker(Field& f, User& other) = 0;
+  virtual Position remove_opponent_marker(Field& f) = 0;
 
   virtual bool is_bot() {
     return false;

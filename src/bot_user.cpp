@@ -5,27 +5,21 @@
 #include <exception>
 #include <float.h>
 #include <iostream>
+#include <random>
 #include <utility>
 #include <vector>
 
 class BotUser : public User {
 private:
-  std::string name = "Bot";
-  char opponent_marker = 'O';
+  Position get_random_position(Field& f, char marker) {
+    std::vector<Position> positions = f.get_all_players_stones(marker);
 
-  /**
-   * @brief get a random stone position of opponent
-   *
-   * @param f Field
-   * @return Position
-   */
-  Position get_random_opponent_position(Field& f) {
-    Position random_pos;
-    do
-      random_pos = get_random_position();
-    while (f.get_field_marker_at_position(random_pos) == this->marker ||
-           f.get_field_marker_at_position(random_pos) == '#');
-    return random_pos;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dist(0, positions.size() - 1);
+    int randomNumber = (int)dist(gen);
+
+    return positions[randomNumber];
   }
 
   // Position move_stone_to_potential_mill(Field& f, char marker) {
@@ -36,7 +30,7 @@ private:
 
   Position select_stone_to_move(Field& f, Position* target_pos, Mill* mill, bool jump_allowed) {
 
-    std::cout << "Jump allowed: " << jump_allowed << std::endl; 
+    std::cout << "Jump allowed: " << jump_allowed << std::endl;
 
     if (jump_allowed) {
       // select stone which is not included within the potential mill
@@ -52,7 +46,7 @@ private:
     for (auto pos : adj_positions) {
       if (!Mills::pos_is_part_of_mill(*pos, *mill) && f.get_field_marker_at_position(*pos) == marker) {
         // Position is not part of the mill and occupied by this bot
-          return *pos;
+        return *pos;
       }
     }
 
@@ -98,11 +92,11 @@ private:
     }
 
     // Random move
-    std::cout << "Random move"<< std::endl;
+    std::cout << "Random move" << std::endl;
     if (jump_allowed) {
       // return random stone to jump to an empty position
-      Position old_pos = f.get_all_players_stones(marker)[0];
-      Position new_pos = f.get_all_players_stones('#')[0];
+      Position old_pos = get_random_position(f, this->marker);
+      Position new_pos = get_random_position(f, f.EMPTY_FIELD);
       return std::pair<Position, Position>(old_pos, new_pos);
     } else {
       // Search for stone with empty neighbour
@@ -133,88 +127,70 @@ public:
       // block opponent's potential mill
       mill_and_pos = Mills::check_potential_mills(f, opponent_marker);
       pos = mill_and_pos.second;
-      if (pos.is_valid() && f.player_set_stone(*this, pos)) {
-        return pos;
-      }
 
       // complete own potential mill
-      mill_and_pos = Mills::check_potential_mills(f, this->marker);
-      pos = mill_and_pos.second;
-      if (pos.is_valid() && f.player_set_stone(*this, pos)) {
-        return pos;
+      if (!pos.is_valid()) {
+        mill_and_pos = Mills::check_potential_mills(f, this->marker);
+        pos = mill_and_pos.second;
       }
     } catch (const std::exception& e) {
       std::cout << e.what() << std::endl;
     }
 
     // fallback: random placement
-    while (true) {
-      try {
-        pos = get_random_position();
-        if (f.player_set_stone(*this, pos)) {
-          return pos;
-        }
-      } catch (const std::exception& e) {
-        std::cout << e.what() << std::endl;
-      }
+    if (!pos.is_valid()) {
+      pos = get_random_position(f, f.EMPTY_FIELD);
     }
-
-    std::cout << "Failed to place marker" << std::endl;
-    return Position();
+    f.player_set_stone(pos, marker);
+    return pos;
   }
 
   std::pair<Position, Position> move_marker(Field& f, bool three_stones_left) override {
+
     // Get move to make
     std::pair<Position, Position> move;
     try {
       move = get_move(f, three_stones_left);
-    }
-    catch(std::exception& e) {
+    } catch (std::exception& e) {
       std::cout << e.what() << std::endl;
     }
+
     Position old_pos = move.first;
     Position new_pos = move.second;
 
     // Update board
-    f.player_remove_stone(*this, old_pos);
-    f.player_set_stone(*this, new_pos);
+    f.player_remove_stone(old_pos, marker);
+    f.player_set_stone(new_pos, marker);
 
     return move;
   }
 
-  Position remove_opponent_marker(Field& f, User& other) override {
-    Position removable_stone;
+  Position remove_opponent_marker(Field& f) override {
 
-    while (true) {
-      try {
-        // try to block opponent's potential mill
-        std::pair<Mill, Position> mill_and_pos = Mills::check_potential_mills(f, this->marker);
-        Mill mill = mill_and_pos.first;
-        Position pos = mill_and_pos.second;
+    // random opponent stone
+    Position removable_stone = get_random_position(f, opponent_marker);
 
-        if (pos.is_valid())
-          for (std::size_t i = 0; i < mill.size(); ++i) {
-            if (mill[i] == pos)
-              continue;
+    // try to block opponent's potential mill
+    try {
+      std::pair<Mill, Position> mill_and_pos = Mills::check_potential_mills(f, opponent_marker);
+      Mill mill = mill_and_pos.first;
+      Position free_pos = mill_and_pos.second;
 
-            char field_marker = f.get_field_marker_at_position(mill[i]);
-            if (field_marker != this->marker && field_marker != '#') {
-              removable_stone = mill[i];
-              break;
-            }
+      if (free_pos.is_valid()) {
+        // check if potential mill found
+        for (auto& pos : mill) {
+          if (pos == free_pos) {
+            continue;
           }
-
-        // fallback: random opponent stone
-        if (!removable_stone.is_valid())
-          removable_stone = get_random_opponent_position(f);
-
-        if (f.opponent_remove_stone(this->marker, removable_stone, other))
+          removable_stone = pos;
           break;
-      } catch (const std::exception& e) {
-        std::cout << e.what() << std::endl;
+        }
       }
+    } catch (const std::exception& e) {
+      std::cout << e.what() << std::endl;
     }
-    other.remove_stone();
+
+    f.player_remove_stone(removable_stone, opponent_marker);
     return removable_stone;
   }
 
