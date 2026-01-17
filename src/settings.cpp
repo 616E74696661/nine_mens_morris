@@ -18,6 +18,11 @@ public:
   int mode;
   std::vector<User*> players;
 
+  /**
+   * @brief Initializes two player's based on the user's input. Either Player vs Player or Player vs Bot
+   *
+   * @return std::vector<User*> Returns two users
+   */
   std::vector<User*> setup() {
     std::string output;
     while (true) {
