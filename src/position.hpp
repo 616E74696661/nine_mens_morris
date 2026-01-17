@@ -9,7 +9,6 @@
 #include <utility>
 #include <vector>
 
-
 static std::array<std::pair<int, int>, 24> valid_positions{
     {{1, 1},
      {4, 1},
@@ -153,6 +152,10 @@ static std::vector<Position> get_valid_positions() {
     positions.push_back(Position(pos_pair.first, pos_pair.second));
   }
   return positions;
+}
+
+static bool contains(std::vector<Position> v, Position p) {
+  return std::find(v.begin(), v.end(), p) != v.end();
 }
 
 #endif // POSITION_HPP
