@@ -50,10 +50,17 @@ public:
   static bool check_mill(const Position& pos, char marker, Field& f) {
     // Loops through all valid mills
     for (const auto& mill : valid_mills_array) {
+
       // If the mill includes the position
       if (std::find(mill.begin(), mill.end(), pos) != mill.end()) {
         // Check if the mill is formed
-        if (f.check_mill(mill, marker)) {
+        int counter = 0;
+        for (auto pos : mill) {
+          if (f.get_field_marker_at_position(pos) == marker) {
+            counter++;
+          }
+        }
+        if (counter == 3) {
           return true;
         }
       }

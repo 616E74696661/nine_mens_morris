@@ -22,12 +22,6 @@ private:
     return positions[randomNumber];
   }
 
-  // Position move_stone_to_potential_mill(Field& f, char marker) {
-  //   std::pair<Mill, Position> mill_and_pos = Mills::check_potential_mills(f, marker);
-  //   if ()
-  //     return Position(0, 0);
-  // }
-
   Position select_stone_to_move(Field& f, Position* target_pos, Mill* mill, bool jump_allowed) {
 
     std::cout << "Jump allowed: " << jump_allowed << std::endl;

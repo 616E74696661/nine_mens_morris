@@ -131,22 +131,6 @@ public:
       current_phase = static_cast<GamePhase>(static_cast<int>(current_phase) + 1);
   }
 
-  bool check_mill(std::array<Position, 3> mill, char marker) {
-    int counter = 0;
-
-    for (auto pos : mill) {
-      try {
-        if (get_field_marker_at_position(pos) == marker) {
-          counter++;
-        }
-      } catch (const std::exception&) {
-        // Invalid position in mill array, skip it
-        return false;
-      }
-    }
-    return counter == 3;
-  }
-
   std::vector<Position> get_all_players_stones(char marker) {
 
     std::vector<Position> players_positions;
