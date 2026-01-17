@@ -102,7 +102,7 @@ private:
       std::vector<Position> own_stones = f.get_all_players_stones(marker);
       for (auto pos : own_stones) {
         for (auto neighbour : pos.get_adjacent_positions()) {
-          if (f.get_field_marker_at_position(*neighbour) == '#') {
+          if (f.get_field_marker_at_position(*neighbour) == f.EMPTY_FIELD) {
             return std::pair<Position, Position>(pos, *neighbour);
           }
         }

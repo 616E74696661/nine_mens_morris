@@ -82,7 +82,7 @@ public:
         char field_marker = f.get_field_marker_at_position(pos);
         if (field_marker == marker) {
           user_in_question_stones++;
-        } else if (field_marker != '#') {
+        } else if (field_marker != f.EMPTY_FIELD) {
           other_user_stones++;
         } else {
           free_pos = pos;
