@@ -1,6 +1,7 @@
 #include "constants/error_messages.hpp"
 #include "field.hpp"
 #include "helper.hpp"
+#include "mill.hpp"
 #include "position.hpp"
 #include "user.hpp"
 #include <cstdlib>
@@ -8,6 +9,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 class PlayerUser : public User {
 public:
@@ -43,6 +45,11 @@ public:
         Position pos(x_pos, y_pos);
 
         if (pos.is_valid()) {
+
+          std::vector<Position> removeable_stones = Mills::get_removeable_stones(f, opponent_marker);
+          if (!contains(removeable_stones, pos)) {
+            throw std::invalid_argument(error_msg::STONE_PART_OF_MILL);
+          }
           f.player_remove_stone(pos, opponent_marker);
           return pos;
         }

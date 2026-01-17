@@ -11,8 +11,13 @@
 
 class BotUser : public User {
 private:
-  Position get_random_position(Field& f, char marker) {
-    std::vector<Position> positions = f.get_all_players_stones(marker);
+  Position get_random_position(Field& f, char marker, std::vector<Position> available_positions = {}) {
+    std::vector<Position> positions;
+    if (available_positions.empty()) {
+      positions = f.get_all_players_stones(marker);
+    } else {
+      positions = available_positions;
+    }
 
     std::random_device rd;
     std::mt19937 gen(rd());
@@ -162,7 +167,8 @@ public:
   Position remove_opponent_marker(Field& f) override {
 
     // random opponent stone
-    Position removable_stone = get_random_position(f, opponent_marker);
+    std::vector<Position> removeable_stones = Mills::get_removeable_stones(f, opponent_marker);
+    Position removable_stone = get_random_position(f, opponent_marker, removeable_stones);
 
     // try to block opponent's potential mill
     try {
@@ -176,8 +182,11 @@ public:
           if (pos == free_pos) {
             continue;
           }
-          removable_stone = pos;
-          break;
+
+          if (contains(removeable_stones, pos)) {
+            removable_stone = pos;
+            break;
+          }
         }
       }
     } catch (const std::exception& e) {

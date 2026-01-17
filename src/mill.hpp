@@ -3,6 +3,7 @@
 
 #include "field.hpp"
 #include "position.hpp"
+#include "set"
 #include <algorithm>
 #include <array>
 #include <utility>
@@ -97,12 +98,66 @@ public:
     return std::pair<Mill, Position>(Mill(), Position());
   }
 
-  static bool pos_is_part_of_mill(Position& target_pos, Mill& mill) {
+  static bool pos_is_part_of_mill(Position& target_pos, const Mill& mill) {
     for (auto pos : mill) {
       if (pos == target_pos)
         return true;
     }
     return false;
+  }
+
+  static std::vector<Position> get_removeable_stones(Field& field, char marker) {
+    // Checks if every stone of this player's marker is in an active mill
+
+    // Get positions of players stones
+    std::vector<Position> players_stones = field.get_all_players_stones(marker);
+    std::set<Position> test;
+
+    // Get all potential mills
+    std::vector<Mill> semi_active_mills;
+    for (auto& mill : valid_mills_array) {
+      for (auto& pos : players_stones) {
+        if (pos_is_part_of_mill(pos, mill)) {
+          semi_active_mills.push_back(mill);
+        }
+      }
+    }
+
+    // Check if every position in this mill is occupied by this player
+    // If yes, remove all of this stones from the vector
+    for (auto& mill : semi_active_mills) {
+      short counter = 0;
+      for (auto& mill_pos : mill) {
+        for (auto& player_pos : players_stones) {
+          if (mill_pos == player_pos) {
+            counter++;
+          }
+        }
+      }
+      if (counter == 3) {
+        // Mill is completed
+        for (auto& pos : mill) {
+          test.insert(pos);
+        }
+      }
+    }
+
+    // If set has all of player's positions, every stone is within an active mill
+    bool all_in_mill = players_stones.size() == test.size();
+    std::cout << "All stones in mill: " << all_in_mill << std::endl;
+
+    if (all_in_mill) {
+      return players_stones;
+    }
+
+    // Remove stones which are included within a mill and return the leftover positions
+    for (auto& pos : test) {
+      players_stones.erase(
+          std::remove(players_stones.begin(), players_stones.end(), pos),
+          players_stones.end());
+    }
+
+    return players_stones;
   }
 };
 

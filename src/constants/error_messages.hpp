@@ -18,5 +18,6 @@ static const std::string TOO_MANY_PLAYERS = "Too many users, maximum is 2";
 static const std::string INVALID_REMOVAL = "Invalid removal, please select an opponent's marker.";
 static const std::string BOT_PLACE_FAIL = "Bot failed to place stone.";
 static const std::string INVALID_NUMBER_OF_STONES = "There is an invalid number of stones from this player on the board.";
+static const std::string STONE_PART_OF_MILL = "Cannot remove this stone because it is part of a completed mill. You may only remove stones from a completed mill, if there is no other option.";
 }; // namespace error_msg
 #endif
