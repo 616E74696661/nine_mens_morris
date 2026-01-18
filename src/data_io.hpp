@@ -30,7 +30,7 @@ public:
     // if directory does not exist -> create the directory
     if (stat(dir.c_str(), &sb) != 0) {
 #if defined(_WIN32)
-      int rc = _mkdir(dir.c_str());
+      int rc = mkdir(dir.c_str());
 #else
       int rc = mkdir(dir.c_str(), 0777);
 #endif
