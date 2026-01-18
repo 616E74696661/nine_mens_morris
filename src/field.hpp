@@ -15,7 +15,7 @@ public:
   Field(std::vector<std::string> field_string = {}) {
     current_phase = OPENING;
     stones_set = 0;
-    if (field_string.empty())
+    if (!field_string.empty())
       field_template = field_string;
   }
 

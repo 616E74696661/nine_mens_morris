@@ -67,6 +67,7 @@ public:
             players.push_back(new BotUser("Bot", stone_data[2], stone_data[3]));
             break;
           }
+          break;
         } else {
 
           std::cout << error_msg::INVALID_SELECTION << std::endl;

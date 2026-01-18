@@ -25,7 +25,9 @@ public:
 
     // save field
     for (int i = 0; i < rows; ++i) {
-      file.write(field[i].data(), field[i].size());
+      std::string row = field[i];
+      row.resize(cols, ' ');
+      file.write(row.data(), cols);
     }
 
     // save mode
@@ -37,8 +39,7 @@ public:
                                  players[1]->get_stones_removed(),
                                  players[1]->get_stones_set()};
     for (auto stone_data : stones_data) {
-      file.write(reinterpret_cast<const char*>(stone_data),
-                 sizeof(int));
+      file.write(reinterpret_cast<const char*>(&stone_data), sizeof(int));
     }
 
     // save active_user
@@ -71,9 +72,13 @@ public:
     // read mode
     file.read(reinterpret_cast<char*>(&mode), sizeof(mode));
     // read players_data
-    size_t size;
-    file.read(reinterpret_cast<char*>(&size), sizeof(size));
-    for (size_t i = 0; i < size; ++i) {
+
+    stones_data.resize(4);
+    file.read(reinterpret_cast<char*>(stones_data.data()),
+              4 * sizeof(int));
+
+    stones_data.resize(4); // oder die feste Anzahl
+    for (size_t i = 0; i < stones_data.size(); ++i) {
       file.read(reinterpret_cast<char*>(&stones_data[i]), sizeof(int));
     }
     // read active_user
