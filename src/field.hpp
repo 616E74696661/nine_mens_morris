@@ -13,6 +13,10 @@
 class Field {
 public:
   static const char EMPTY_FIELD = '#'; // Marker for a empty position
+  Field(std::vector<std::string> field_string = {}) {
+    if (!field_string.empty())
+      field_template = field_string;
+  }
 
   /**
    * @brief Get the field marker at the given position
@@ -55,8 +59,8 @@ public:
    *
    */
   void field_output() {
-    for (int i = 0; i < FIELD_HEIGHT; i++) {
-      if (i % 2 == 0 && i != FIELD_HEIGHT - 1)
+    for (int i = 0; i < field_template.size(); i++) {
+      if (i % 2 == 0 && i != field_template[0].size() - 1)
         std::cout << 7 - (i / 2) << "  ";
       else
         std::cout << "   ";
@@ -132,15 +136,16 @@ public:
     return players_positions;
   }
 
-private:
-  static const int FIELD_WIDTH = 26;
-  static const int FIELD_HEIGHT = 15;
+  std::vector<std::string>& get_field_template() {
+    return field_template;
+  }
 
+private:
   /**
    * @brief Template of the game board
    *
    */
-  char field_template[FIELD_HEIGHT][FIELD_WIDTH] = {
+  std::vector<std::string> field_template = { // oder so
       "#-----------#-----------#",
       "|           |           |",
       "|   #-------#-------#   |",

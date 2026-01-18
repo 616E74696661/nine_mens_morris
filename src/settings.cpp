@@ -4,8 +4,11 @@
 #include "bot_user.cpp"
 #include "constants/error_messages.hpp"
 #include "constants/game_text.hpp"
+#include "data_io.hpp"
+#include "helper.hpp"
 #include "player_user.cpp"
 #include <exception>
+#include <iostream>
 #include <vector>
 
 enum GameMode {
@@ -23,12 +26,34 @@ public:
    *
    * @return std::vector<User*> Returns two users
    */
-  std::vector<User*> setup() {
+  std::vector<User*> setup(Field& field, int& iteration) {
     std::string output;
     while (true) {
       try {
+
         mode = Helper::read_uint(game_text::GAME_MODE);
 
+        if (mode == 9) {
+          DataIO data_io;
+          int mode_data;
+          std::vector<int> stones_data;
+          if (data_io.import_data(field, mode_data, stones_data, iteration)) {
+            switch (mode_data) {
+            case PLAYER_VS_PLAYER:
+              players.push_back(new PlayerUser("Player 1", stones_data[0], stones_data[1]));
+              players.push_back(new PlayerUser("Player 2", stones_data[2], stones_data[3]));
+              break;
+            case PLAYER_VS_BOT:
+              players.push_back(new PlayerUser("Player 1", stones_data[0], stones_data[1]));
+              players.push_back(new BotUser("Bot", stones_data[2], stones_data[3]));
+              break;
+            }
+            break;
+          }
+          Helper::clear_console();
+          std::cout << "No Gamestate found." << std::endl;
+          mode = Helper::read_uint(game_text::GAME_MODE_NO_FILE);
+        }
         if (mode == PLAYER_VS_PLAYER) {
           output = "Player vs Player mode selected.";
           players.push_back(new PlayerUser("Player 1"));
@@ -40,11 +65,11 @@ public:
           players.push_back(new PlayerUser("Player 1"));
           players.push_back(new BotUser("Bot"));
           break;
-        } else {
+        } else
+          break;
 
-          std::cout << error_msg::INVALID_SELECTION << std::endl;
-          std::cout << "--------------------------" << std::endl;
-        }
+        std::cout << error_msg::INVALID_SELECTION << std::endl;
+        std::cout << "--------------------------" << std::endl;
       } catch (std::exception) {
         std::cout << error_msg::INVALID_SELECTION << std::endl;
         std::cout << "--------------------------" << std::endl;

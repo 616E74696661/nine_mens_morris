@@ -1,6 +1,8 @@
 #include "field.hpp"
 #include "mill.hpp"
 #include "settings.cpp"
+#include <csignal>
+#include <cstdlib>
 #include <iostream>
 #include <stdexcept>
 #include <string>
@@ -15,12 +17,14 @@ Position handle_opening();
 // Position handle_midgame();
 Position handle_endgame();
 
+DataIO data_io;
 Settings setting;
 Field f;
 Position pos;
 std::vector<User*> players;
-User* active_user = nullptr;
-int MAX_NUM_STONES = 9;
+User* active_user;
+int MAX_NUM_STONES;
+int iteration;
 
 /**
  * @brief Gamestart and gameloop
@@ -28,7 +32,6 @@ int MAX_NUM_STONES = 9;
  * @return int
  */
 int main() {
-
   init();
 
   // ensure active player is set
@@ -36,9 +39,7 @@ int main() {
     throw std::logic_error("No active player set");
   }
 
-  int iteration = 0;
   while (true) {
-
     // handle a turn
     pos = game();
 
@@ -47,6 +48,8 @@ int main() {
 
     // switch active player
     active_user = players.at((++iteration) % 2);
+
+    data_io.export_data(f.get_field_template(), setting.mode, setting.players, iteration);
   }
 }
 
@@ -55,10 +58,13 @@ int main() {
  *
  */
 void init() {
-  players = setting.setup();
+  active_user = nullptr;
+  MAX_NUM_STONES = 9;
+  iteration = 0;
+  players = setting.setup(f, iteration);
   if (players.empty())
     throw std::logic_error("No players");
-  active_user = players.at(0);
+  active_user = players.at((iteration) % 2);
   std::cout << game_text::WELCOME << std::endl;
 }
 

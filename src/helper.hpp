@@ -21,6 +21,8 @@ inline int read_uint(const std::string& prompt) {
 
   size_t pos;
   long value;
+  if (input == "stop")
+    std::exit(0);
   try {
     value = std::stoul(input, &pos);
   } catch (std::invalid_argument) {
@@ -42,6 +44,7 @@ inline int read_uint(const std::string& prompt) {
  */
 inline void clear_console() {
   system(clear_cmd.c_str());
+  std::cout << std::endl;
 }
 
 } // namespace Helper

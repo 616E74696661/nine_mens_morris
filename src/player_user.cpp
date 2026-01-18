@@ -18,9 +18,10 @@ public:
    * @brief Construct a new Player User object
    *
    * @param name Name of the Player
+   * @param set Number of set stones by the user
+   * @param removed Number of stones removed by the opponent
    */
-  PlayerUser(std::string name) : User(name) {
-  }
+  PlayerUser(std::string name, int set = 0, int removed = 0) : User(name, set, removed) {}
 
   /**
    * @brief Place a marker on the gameboard

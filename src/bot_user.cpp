@@ -143,8 +143,10 @@ public:
    * @brief Construct a new Bot User
    *
    * @param name
+   * @param set Number of set stones by the user
+   * @param removed Number of stones removed by the opponent
    */
-  BotUser(std::string name) : User(name) {}
+  BotUser(std::string name, int set = 0, int removed = 0) : User(name, set, removed) {}
 
   /**
    * @brief Bot places a marker. First trying to prevent opponent's mill, then try to complete own mill otherwise place randomly

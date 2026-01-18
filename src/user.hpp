@@ -46,12 +46,14 @@ public:
    * @brief Construct a new User object
    *
    * @param name Player's displayed name
+   * @param set Number of set stones by the user
+   * @param removed Number of stones removed by the opponent
    */
-  User(std::string name) : name(name) {
+  User(std::string name, int set = 0, int removed = 0) : name(name) {
     num_players++;
     define_marker();
-    stones_set = 0;
-    stones_removed = 0;
+    stones_set = set;
+    stones_removed = removed;
   }
 
   /**
