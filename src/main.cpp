@@ -9,7 +9,7 @@
 void init();
 Position game();
 void check_for_closed_mill(Field&, Position&, User&);
-User& get_other_player(User& active_user, const std::vector<User*>& players);
+User& get_inactive_player(User& active_user, const std::vector<User*>& players);
 void game_lost(User& loser);
 Position handle_opening();
 // Position handle_midgame();
@@ -20,11 +20,21 @@ Field f;
 Position pos;
 std::vector<User*> players;
 User* active_user = nullptr;
-int MAX_NUM_STONES = 9; // change to 9
+int MAX_NUM_STONES = 9;
 
+/**
+ * @brief Gamestart and gameloop
+ *
+ * @return int
+ */
 int main() {
 
   init();
+
+  // ensure active player is set
+  if (active_user == nullptr) {
+    throw std::logic_error("No active player set");
+  }
 
   int iteration = 0;
   while (true) {
@@ -40,6 +50,10 @@ int main() {
   }
 }
 
+/**
+ * @brief Initialize game and players, set active player
+ *
+ */
 void init() {
   players = setting.setup();
   if (players.empty())
@@ -48,6 +62,11 @@ void init() {
   std::cout << game_text::WELCOME << std::endl;
 }
 
+/**
+ * @brief Checks whether the game is over or not
+ *
+ * @param active_user
+ */
 void check_game_over(User& active_user) {
 
   if (!f.available_to_move(active_user)) {
@@ -59,12 +78,12 @@ void check_game_over(User& active_user) {
   }
 }
 
+/**
+ * @brief Placing, moving and removing stones
+ *
+ * @return Position
+ */
 Position game() {
-
-  // ensure active player is set
-  if (active_user == nullptr) {
-    throw std::logic_error("No active player set");
-  }
 
   // check if user is a player
   if (!active_user->is_bot()) {
@@ -122,15 +141,22 @@ void check_for_closed_mill(Field& field, Position& pos, User& active_user) {
   if (mill_closed) {
     Position removed_stone = active_user.remove_opponent_marker(field);
 
-    get_other_player(active_user, players).remove_stone();
+    get_inactive_player(active_user, players).remove_stone();
 
-    std::cout << active_user.name << " formed a mill -> removed stone of " << get_other_player(active_user, players).name
+    std::cout << active_user.name << " formed a mill -> removed stone of " << get_inactive_player(active_user, players).name
               << " on Position y: " << removed_stone.y << "x: " << removed_stone.x << std::endl;
   } else
     std::cout << std::endl;
 }
 
-User& get_other_player(User& active_user, const std::vector<User*>& players) {
+/**
+ * @brief Get the other player object
+ *
+ * @param active_user
+ * @param players
+ * @return User&
+ */
+User& get_inactive_player(User& active_user, const std::vector<User*>& players) {
   if (players.size() != 2) {
     throw std::logic_error("This function only works with 2 players");
   }
@@ -138,8 +164,13 @@ User& get_other_player(User& active_user, const std::vector<User*>& players) {
       (players[0] == &active_user) ? players[1] : players[0]);
 }
 
+/**
+ * @brief Handle gameover
+ *
+ * @param loser Player who lost the game
+ */
 void game_lost(User& loser) {
-  User& other = get_other_player(*active_user, players);
+  User& other = get_inactive_player(*active_user, players);
   std::cout << active_user->name << " has lost!" << std::endl;
   std::cout << other.name << " wins the game!" << std::endl;
   std::exit(0);
