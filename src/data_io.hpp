@@ -25,7 +25,6 @@ public:
 #else
       int rc = mkdir(dir.c_str(), 0777);
 #endif
-      if (rc == 0)
     }
 
     std::ofstream file(dir + file_name, std::ios_base::trunc);
@@ -63,14 +62,14 @@ public:
     printf("succeeded :)\n\tfilename: %s\n", file_name.c_str());
   }
 
-  void import_data(Field& field, int& mode, std::vector<int>& stones_data, int& iteration) {
+  bool import_data(Field& field, int& mode, std::vector<int>& stones_data, int& iteration) {
     std::vector<std::string> field_vector;
     std::cout << "loading game... " << std::endl;
     std::ifstream file(dir + file_name, std::ios_base::binary);
 
     if (!file.is_open()) {
       printf("failed :(\n");
-      return;
+      return false;
     }
 
     // read field
@@ -98,6 +97,7 @@ public:
     file.close();
 
     printf("succeeded :)\n\tfilename: %s\n", file_name.c_str());
+    return true;
   }
 
 private:

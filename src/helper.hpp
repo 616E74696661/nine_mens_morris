@@ -40,6 +40,7 @@ inline int read_uint(const std::string& prompt) {
 
 inline void clear_console() {
   system(clear_cmd.c_str());
+  std::cout << std::endl;
 }
 
 } // namespace Helper
