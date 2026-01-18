@@ -34,8 +34,10 @@ public:
 #else
       int rc = mkdir(dir.c_str(), 0777);
 #endif
-      if (rc != 0)
-        return false; // directory not created
+      if (rc != 0) {
+        printf("AAAA\n");
+        return false; // directory not created}
+      }
     }
 
     std::ofstream file(dir + file_name, std::ios_base::trunc);

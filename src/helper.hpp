@@ -3,6 +3,7 @@
 #include "constants/error_messages.hpp"
 #include <iostream>
 #include <limits>
+#include <stdexcept>
 #include <string>
 
 #ifdef _WIN32
@@ -14,6 +15,10 @@ const std::string clear_cmd = "clear";
 namespace Helper {
 static const int ANIMATION_TIME = 10;
 
+struct close_game : std::runtime_error {
+  close_game() : std::runtime_error("close game") {}
+};
+
 inline int read_uint(const std::string& prompt) {
   std::string input;
   std::cout << prompt;
@@ -22,7 +27,7 @@ inline int read_uint(const std::string& prompt) {
   size_t pos;
   long value;
   if (input == "stop")
-    std::exit(0);
+    throw close_game();
   try {
     value = std::stoul(input, &pos);
   } catch (std::invalid_argument) {

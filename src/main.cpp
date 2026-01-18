@@ -1,4 +1,5 @@
 #include "field.hpp"
+#include "helper.hpp"
 #include "mill.hpp"
 #include "settings.cpp"
 #include <csignal>
@@ -39,17 +40,23 @@ int main() {
     throw std::logic_error("No active player set");
   }
 
-  while (true) {
-    // handle a turn
-    pos = game();
+  int iteration = 0;
+  try {
+    while (true) {
 
-    // check for closed mill
-    check_for_closed_mill(f, pos, *active_user);
+      // handle a turn
+      pos = game();
 
-    // switch active player
-    active_user = players.at((++iteration) % 2);
+      // check for closed mill
+      check_for_closed_mill(f, pos, *active_user);
 
-    data_io.export_data(f.get_field_template(), setting.mode, setting.players, iteration);
+      // switch active player
+      active_user = players.at((++iteration) % 2);
+
+      data_io.export_data(f.get_field_template(), setting.mode, setting.players, iteration);
+    }
+  } catch (const Helper::close_game&) {
+    std::cout << "Game over!\n";
   }
 }
 
@@ -126,11 +133,11 @@ Position game() {
   } else {
     throw std::range_error("FATAL ERROR. PLAYER PLAYED MORE THAN 9 STONES.");
   }
-
   std::cout << ">>> Set: " << active_user->get_stones_set() << " Removed: " << active_user->get_stones_removed() << " Board: " << active_user->get_stones_on_board() << std::endl;
 
   // Helper::clear_console();
   std::cout << output << std::endl;
+
   return new_pos;
 }
 
@@ -179,5 +186,5 @@ void game_lost(User& loser) {
   User& other = get_inactive_player(*active_user, players);
   std::cout << active_user->name << " has lost!" << std::endl;
   std::cout << other.name << " wins the game!" << std::endl;
-  std::exit(0);
+  throw Helper::close_game();
 }

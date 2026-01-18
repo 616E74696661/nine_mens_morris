@@ -129,7 +129,7 @@ public:
           f.player_set_stone(*old_pos, marker);
         } catch (const std::exception& e) {
           std::cout << "Error at rollback during player's move. Quitting program" << std::endl;
-          std::exit(1);
+          throw Helper::close_game();
         }
       }
     }
