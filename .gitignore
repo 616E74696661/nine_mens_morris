@@ -44,4 +44,4 @@
 .vscode
 
 # gamestate file
-data.bin
+*.bin
