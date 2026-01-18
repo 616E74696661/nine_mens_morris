@@ -36,6 +36,10 @@ inline int read_uint(const std::string& prompt) {
   return static_cast<int>(value);
 }
 
+/**
+ * @brief Clears the console
+ *
+ */
 inline void clear_console() {
   system(clear_cmd.c_str());
 }

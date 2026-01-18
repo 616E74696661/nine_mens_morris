@@ -11,6 +11,14 @@
 
 class BotUser : public User {
 private:
+  /**
+   * @brief Get a random position of the marker's stones
+   *
+   * @param f Gameboard
+   * @param marker Marker to search stoens of
+   * @param available_positions Optional vector to get random position from
+   * @return Random position
+   */
   Position get_random_position(Field& f, char marker, std::vector<Position> available_positions = {}) {
     std::vector<Position> positions;
     if (available_positions.empty()) {
@@ -27,7 +35,16 @@ private:
     return positions[randomNumber];
   }
 
-  Position select_stone_to_move(Field& f, Position* target_pos, Mill* mill, bool jump_allowed) {
+  /**
+   * @brief Get stone to move to target position and prevent / complete mill
+   *
+   * @param f Gameboard
+   * @param target_pos The position to move to
+   * @param mill The potential mill to be prevented / completed
+   * @param jump_allowed Boolean to decide whether you can jump with your stones
+   * @return Position of the stone to move to the target position. If no stone was found, return invalid position
+   */
+  Position select_stone_to_fill_mill(Field& f, Position* target_pos, Mill* mill, bool jump_allowed) {
 
     std::cout << "Jump allowed: " << jump_allowed << std::endl;
 
@@ -56,6 +73,13 @@ private:
     return Position();
   }
 
+  /**
+   * @brief Returns a move. This includes the old and new position of a stone. First try to complete own mill, then try to prevent opponent's mill otherwise return random move
+   *
+   * @param f The gameboard
+   * @param jump_allowed Boolean to decide whether you can jump with your stones
+   * @return std::pair<Position, Position> Old position and new position of the stone moved
+   */
   std::pair<Position, Position> get_move(Field& f, bool jump_allowed) {
 
     // try to complete own potential mill
@@ -64,11 +88,10 @@ private:
     Position target_pos = mill_and_pos.second;
 
     Position moveable_stone;
-    bool able_to_block_or_complete_mill = false;
 
     if (target_pos.is_valid()) {
       std::cout << "Trying to complete own mill" << std::endl;
-      moveable_stone = select_stone_to_move(f, &target_pos, &target_mill, jump_allowed);
+      moveable_stone = select_stone_to_fill_mill(f, &target_pos, &target_mill, jump_allowed);
 
       if (moveable_stone.is_valid()) {
         f.validate_coordinates(moveable_stone, marker);
@@ -83,12 +106,14 @@ private:
 
     if (target_pos.is_valid()) {
       std::cout << "Trying to block opponent's mill" << std::endl;
-      moveable_stone = select_stone_to_move(f, &target_pos, &target_mill, jump_allowed);
+      moveable_stone = select_stone_to_fill_mill(f, &target_pos, &target_mill, jump_allowed);
       if (moveable_stone.is_valid()) {
         f.validate_coordinates(moveable_stone, marker);
         return std::pair<Position, Position>(moveable_stone, target_pos);
       }
     }
+
+    // No stone was found to either complete or prevent a mill
 
     // Random move
     std::cout << "Random move" << std::endl;
@@ -114,8 +139,19 @@ private:
   }
 
 public:
+  /**
+   * @brief Construct a new Bot User
+   *
+   * @param name
+   */
   BotUser(std::string name) : User(name) {}
 
+  /**
+   * @brief Bot places a marker. First trying to prevent opponent's mill, then try to complete own mill otherwise place randomly
+   *
+   * @param f The gameboard
+   * @return Position the stone was set on
+   */
   Position place_marker(Field& f) override {
 
     set_stone();
@@ -144,6 +180,13 @@ public:
     return pos;
   }
 
+  /**
+   * @brief Bot moves a marker.
+   *
+   * @param f
+   * @param three_stones_left
+   * @return std::pair<Position, Position>
+   */
   std::pair<Position, Position> move_marker(Field& f, bool three_stones_left) override {
 
     // Get move to make
@@ -164,6 +207,12 @@ public:
     return move;
   }
 
+  /**
+   * @brief Bot removes player's stone
+   *
+   * @param f The gameboard
+   * @return Position of the removed marker
+   */
   Position remove_opponent_marker(Field& f) override {
 
     // random opponent stone
@@ -197,6 +246,12 @@ public:
     return removable_stone;
   }
 
+  /**
+   * @brief Returns a boolean which says whether the player is a bot or not
+   *
+   * @return true if player is a bot
+   * @return false if player is a human player
+   */
   bool is_bot() override {
     return true;
   }

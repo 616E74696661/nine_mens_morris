@@ -9,6 +9,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <utility>
 #include <vector>
 
 class PlayerUser : public User {
@@ -80,10 +81,10 @@ public:
    * @brief Move a stones in from one position to another
    *
    * @param f The field with the current gamestate
-   * @param three_stones_left A boolean which decides whether a player is able to jump with it's stones or not
+   * @param jump_allowed A boolean which decides whether a player is able to jump with it's stones or not
    * @return std::pair<Position, Position> The old position where the marker has been and the new position where it has been moved to
    */
-  std::pair<Position, Position> move_marker(Field& f, bool three_stones_left) override {
+  std::pair<Position, Position> move_marker(Field& f, bool jump_allowed) override {
 
     while (true) {
       // select stone to move
@@ -106,14 +107,14 @@ public:
 
       // if we reach this point, stone was successfully removed
 
-      // select new position to move stone to
+      // Select new position to move stone to
       try {
         std::cout << "Select new position:" << std::endl;
         int y_pos = Helper::read_uint("y: ");
         int x_pos = Helper::read_uint("x: ");
         Position new_pos = Position(x_pos, y_pos);
 
-        if (three_stones_left || Position::is_adjacent_position(*old_pos, new_pos)) {
+        if (jump_allowed || Position::is_adjacent_position(*old_pos, new_pos)) {
           f.player_set_stone(new_pos, marker);
           return std::pair<Position, Position>(*old_pos, new_pos);
         }
