@@ -21,6 +21,8 @@ inline int read_uint(const std::string& prompt) {
 
   size_t pos;
   long value;
+  if (input == "stop")
+    std::exit(0);
   try {
     value = std::stoul(input, &pos);
   } catch (std::invalid_argument) {
