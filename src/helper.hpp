@@ -3,6 +3,7 @@
 #include "constants/error_messages.hpp"
 #include <iostream>
 #include <limits>
+#include <stdexcept>
 #include <string>
 
 #ifdef _WIN32
@@ -43,6 +44,10 @@ inline int read_uint(const std::string& prompt) {
 inline void clear_console() {
   system(clear_cmd.c_str());
 }
+
+struct close_game : std::runtime_error {
+  close_game() : std::runtime_error("close game") {}
+};
 
 } // namespace Helper
 #endif

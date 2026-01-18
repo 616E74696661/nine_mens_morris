@@ -1,4 +1,5 @@
 #include "field.hpp"
+#include "helper.hpp"
 #include "mill.hpp"
 #include "settings.cpp"
 #include <iostream>
@@ -37,16 +38,20 @@ int main() {
   }
 
   int iteration = 0;
-  while (true) {
+  try {
+    while (true) {
 
-    // handle a turn
-    pos = game();
+      // handle a turn
+      pos = game();
 
-    // check for closed mill
-    check_for_closed_mill(f, pos, *active_user);
+      // check for closed mill
+      check_for_closed_mill(f, pos, *active_user);
 
-    // switch active player
-    active_user = players.at((++iteration) % 2);
+      // switch active player
+      active_user = players.at((++iteration) % 2);
+    }
+  } catch (const Helper::close_game&) {
+    std::cout << "Game over!\n";
   }
 }
 
@@ -105,9 +110,6 @@ Position game() {
   } else if (placed_stones == MAX_NUM_STONES) {
     // Midgame / Endgame phase: move stones
 
-    // Check game over
-    check_game_over(*active_user);
-
     // Move stone
     std::pair<Position, Position> pos_pair;
     bool three_stones_left = active_user->get_stones_on_board() == 3;
@@ -120,11 +122,16 @@ Position game() {
   } else {
     throw std::range_error("FATAL ERROR. PLAYER PLAYED MORE THAN 9 STONES.");
   }
-
   std::cout << ">>> Set: " << active_user->get_stones_set() << " Removed: " << active_user->get_stones_removed() << " Board: " << active_user->get_stones_on_board() << std::endl;
 
   // Helper::clear_console();
   std::cout << output << std::endl;
+
+  placed_stones = active_user->get_stones_set();
+  // Check game over
+  if (placed_stones == MAX_NUM_STONES)
+    check_game_over(*active_user);
+
   return new_pos;
 }
 
@@ -173,5 +180,5 @@ void game_lost(User& loser) {
   User& other = get_inactive_player(*active_user, players);
   std::cout << active_user->name << " has lost!" << std::endl;
   std::cout << other.name << " wins the game!" << std::endl;
-  std::exit(0);
+  throw Helper::close_game();
 }
