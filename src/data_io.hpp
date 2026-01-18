@@ -8,6 +8,7 @@
 #include <iostream>
 #include <regex.h>
 #include <string>
+#include <sys/stat.h>
 #include <vector>
 
 class DataIO {
@@ -16,7 +17,25 @@ public:
   void export_data(std::vector<std::string> field, int& mode, std::vector<User*>& players, int& iteration) {
 
     std::cout << "saving game... " << std::endl;
-    std::ofstream file(file_name, std::ios_base::trunc);
+    struct stat sb;
+
+    if (stat(dir.c_str(), &sb) != 0) {
+#if defined(_WIN32)
+      int rc = _mkdir(dir.c_str());
+      std::cout << "win " << std::endl;
+
+#else
+      int rc = mkdir(dir.c_str(), 0777);
+      std::cout << "macos " << std::endl;
+
+#endif
+      if (rc == 0)
+        std::cout << "CREATED " << std::endl;
+      else
+        std::cout << "NOT CREATED " << std::endl;
+    }
+
+    std::ofstream file(dir + file_name, std::ios_base::trunc);
 
     if (!file.is_open()) {
       printf("failed :(\n");
@@ -54,7 +73,7 @@ public:
   void import_data(Field& field, int& mode, std::vector<int>& stones_data, int& iteration) {
     std::vector<std::string> field_vector;
     std::cout << "loading game... " << std::endl;
-    std::ifstream file(file_name, std::ios_base::binary);
+    std::ifstream file(dir + file_name, std::ios_base::binary);
 
     if (!file.is_open()) {
       printf("failed :(\n");
@@ -89,7 +108,8 @@ public:
   }
 
 private:
-  std::string file_name = "saved/data.bin";
+  const std::string dir = "saved";
+  const std::string file_name = "/data.bin";
   int rows = 15;
   int cols = 26;
 };
