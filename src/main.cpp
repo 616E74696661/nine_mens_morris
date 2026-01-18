@@ -110,6 +110,9 @@ Position game() {
   } else if (placed_stones == MAX_NUM_STONES) {
     // Midgame / Endgame phase: move stones
 
+    // Check game over
+    check_game_over(*active_user);
+
     // Move stone
     std::pair<Position, Position> pos_pair;
     bool three_stones_left = active_user->get_stones_on_board() == 3;
@@ -126,11 +129,6 @@ Position game() {
 
   // Helper::clear_console();
   std::cout << output << std::endl;
-
-  placed_stones = active_user->get_stones_set();
-  // Check game over
-  if (placed_stones == MAX_NUM_STONES)
-    check_game_over(*active_user);
 
   return new_pos;
 }
