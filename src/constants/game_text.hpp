@@ -3,16 +3,19 @@
 
 #include <string>
 namespace game_text {
-static const std::string WELCOME = "Welcome to Muehle!";
+static const std::string WELCOME =
+    "\nWelcome to Nine Men's Morris!\n\n"
+    "GOAL:\tGet 3 stones in a row to remove an opponent's stone.\n"
+    "\tWin by reducing opponent to 2 stones or blocking all moves.\n\n"
+    "PHASES:\n"
+    "\tOpening: Place your 9 stones on the board\n"
+    "\tMidgame: Move stones to adjacent positions\n"
+    "\tEndgame: With 3 stones left, jump anywhere\n\n"
+    "Type 'stop' to quit. Game auto-saves after each turn.\n";
+static const std::string EXPLAINING = "";
 static const std::string GAME_MODE_NO_FILE = "Please select a game mode:\n1. Player vs Player\n2. Player vs Bot\n";
 static const std::string GAME_MODE = GAME_MODE_NO_FILE + "9. Load latest gamestate\n";
-
-static const std::string WIN = "You won! :)";
-static const std::string LOSE = "You lost! :(";
-static const std::string INVALID_INPUT = "Invalid input";
-static const std::string OPTIONS =
-    "Press '1' to start playing\nPress '2' to go to the settings";
-static const std::string SETTINGS =
-    "Press 'a' to set the color of the users\nPress 'b' to";
+static const std::string PVP_SELECTED = "Player vs Player mode selected.";
+static const std::string PVBOT_SELECTED = "Player vs Player mode selected.";
 }; // namespace game_text
 #endif

@@ -67,6 +67,7 @@ int main() {
  *
  */
 void init() {
+  std::cout << game_text::WELCOME << std::endl;
   active_user = nullptr;
   MAX_NUM_STONES = 9;
   iteration = 0;
@@ -74,7 +75,6 @@ void init() {
   if (players.empty())
     throw std::logic_error("No players");
   active_user = players.at((iteration) % 2);
-  std::cout << game_text::WELCOME << std::endl;
 }
 
 /**
@@ -136,6 +136,8 @@ Position game() {
     throw std::range_error("FATAL ERROR. PLAYER PLAYED MORE THAN 9 STONES.");
   }
   std::cout << ">>> Set: " << active_user->get_stones_set() << " Removed: " << active_user->get_stones_removed() << " Board: " << active_user->get_stones_on_board() << std::endl;
+
+  Helper::clear_console();
 
   std::cout << output << std::endl;
 

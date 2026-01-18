@@ -38,12 +38,15 @@ public:
           int mode_data;
           std::vector<int> stones_data;
           if (data_io.import_data(field, mode_data, stones_data, iteration)) {
+            output = "Loading game...\n";
             switch (mode_data) {
             case PLAYER_VS_PLAYER:
+              output += game_text::PVP_SELECTED;
               players.push_back(new PlayerUser("Player 1", stones_data[0], stones_data[1]));
               players.push_back(new PlayerUser("Player 2", stones_data[2], stones_data[3]));
               break;
             case PLAYER_VS_BOT:
+              output += game_text::PVBOT_SELECTED;
               players.push_back(new PlayerUser("Player 1", stones_data[0], stones_data[1]));
               players.push_back(new BotUser("Bot", stones_data[2], stones_data[3]));
               break;
@@ -55,13 +58,13 @@ public:
           mode = Helper::read_uint(game_text::GAME_MODE_NO_FILE);
         }
         if (mode == PLAYER_VS_PLAYER) {
-          output = "Player vs Player mode selected.";
+          output = game_text::PVP_SELECTED;
           players.push_back(new PlayerUser("Player 1"));
           players.push_back(new PlayerUser("Player 2"));
           break;
 
         } else if (mode == PLAYER_VS_BOT) {
-          output = "Player vs Bot mode selected.";
+          output = game_text::PVBOT_SELECTED;
           players.push_back(new PlayerUser("Player 1"));
           players.push_back(new BotUser("Bot"));
           break;
