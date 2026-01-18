@@ -8,8 +8,16 @@
 #include <array>
 #include <utility>
 
+/**
+ * @brief Alias for a mill containing exactly three Position elements.
+ *
+ */
 using Mill = std::array<Position, 3>;
 
+/**
+ * @brief Array containing every possible mill
+ *
+ */
 static const std::array<Mill, 16> valid_mills_array{
     {{Position{1, 1}, Position{1, 4}, Position{1, 7}},
      {Position{2, 2}, Position{2, 4}, Position{2, 6}},
@@ -30,24 +38,31 @@ static const std::array<Mill, 16> valid_mills_array{
 
 class Mills {
 public:
-  // Compares two mills for equality, no matter the order of positions
+  /**
+   * @brief Compares two mills for equality, no matter the order of positions
+
+   *
+   * @param a First mill
+   * @param b Second mill
+   * @return true Mills equal each other
+   * @return false Mills are not equal
+   */
   static bool millsEqual(Mill a, Mill b) {
     std::sort(a.begin(), a.end());
     std::sort(b.begin(), b.end());
     return a == b;
   }
 
-  // Checks if a mill is valid
-  static bool isValidMill(const Mill& mill) {
-    for (const auto& validMill : valid_mills_array) {
-      if (millsEqual(mill, validMill)) {
-        return true;
-      }
-    }
-    return false;
-  }
+  /**
+   * @brief Checks if a mill is formed at the given position for the given marker
 
-  // Checks if a mill is formed at the given position for the given marker
+   *
+   * @param pos Latest stone set on the board
+   * @param marker The marker to check the mill for
+   * @param f The board
+   * @return true A mill has been completed
+   * @return false No mill has been completed
+   */
   static bool check_mill(const Position& pos, char marker, Field& f) {
     // Loops through all valid mills
     for (const auto& mill : valid_mills_array) {
@@ -69,6 +84,13 @@ public:
     return false;
   }
 
+  /**
+   * @brief Searches for potential mills to be closed
+   *
+   * @param f The board
+   * @param marker The marker to search potential mills for
+   * @return std::pair<Mill, Position> A potential mill and the free position of it. The position is invalid, if no potential mill was found
+   */
   static std::pair<Mill, Position> check_potential_mills(Field& f, char marker) {
     // Returns a mill that can be completed and the free position to complete it
 
@@ -98,6 +120,14 @@ public:
     return std::pair<Mill, Position>(Mill(), Position());
   }
 
+  /**
+   * @brief Checks whether the given position is part of the given mill or not
+   *
+   * @param target_pos Position to check
+   * @param mill Mill to check
+   * @return true Position is part of the mill
+   * @return false POsition is not part of the mill
+   */
   static bool pos_is_part_of_mill(Position& target_pos, const Mill& mill) {
     for (auto pos : mill) {
       if (pos == target_pos)
@@ -106,12 +136,18 @@ public:
     return false;
   }
 
+  /**
+   * @brief Get all removable stones of this marker
+   *
+   * @param field The gameboard
+   * @param marker The marker refering to the player's stones
+   * @return std::vector<Position>
+   */
   static std::vector<Position> get_removeable_stones(Field& field, char marker) {
-    // Checks if every stone of this player's marker is in an active mill
 
     // Get positions of players stones
     std::vector<Position> players_stones = field.get_all_players_stones(marker);
-    std::set<Position> test;
+    std::set<Position> stones_in_mills;
 
     // Get all potential mills
     std::vector<Mill> semi_active_mills;
@@ -124,7 +160,7 @@ public:
     }
 
     // Check if every position in this mill is occupied by this player
-    // If yes, remove all of this stones from the vector
+    // If yes, cache these positions
     for (auto& mill : semi_active_mills) {
       short counter = 0;
       for (auto& mill_pos : mill) {
@@ -135,28 +171,27 @@ public:
         }
       }
       if (counter == 3) {
-        // Mill is completed
+        // Completed mill, cache positions
         for (auto& pos : mill) {
-          test.insert(pos);
+          stones_in_mills.insert(pos);
         }
       }
     }
 
     // If set has all of player's positions, every stone is within an active mill
-    bool all_in_mill = players_stones.size() == test.size();
-    std::cout << "All stones in mill: " << all_in_mill << std::endl;
+    bool all_in_mill = players_stones.size() == stones_in_mills.size();
 
+    // If every stone is within a mill, every stone can be removed
     if (all_in_mill) {
       return players_stones;
     }
 
-    // Remove stones which are included within a mill and return the leftover positions
-    for (auto& pos : test) {
+    // Return all positions which are not included within completed mills
+    for (auto& pos : stones_in_mills) {
       players_stones.erase(
           std::remove(players_stones.begin(), players_stones.end(), pos),
           players_stones.end());
     }
-
     return players_stones;
   }
 };

@@ -13,9 +13,20 @@
 
 class PlayerUser : public User {
 public:
+  /**
+   * @brief Construct a new Player User object
+   *
+   * @param name Name of the Player
+   */
   PlayerUser(std::string name) : User(name) {
   }
 
+  /**
+   * @brief Place a marker on the gameboard
+   *
+   * @param f The gameboard
+   * @return The position the marker has been placed on
+   */
   Position place_marker(Field& f) override {
     set_stone();
 
@@ -35,6 +46,12 @@ public:
     }
   }
 
+  /**
+   * @brief Remove one of the opponent's markers
+   *
+   * @param f The gamegoard
+   * @return Position of the removed marker
+   */
   Position remove_opponent_marker(Field& f) override {
     std::cout << "You formed a mill! Select an opponent's marker to remove:" << std::endl;
 
@@ -59,6 +76,13 @@ public:
     }
   }
 
+  /**
+   * @brief Move a stones in from one position to another
+   *
+   * @param f The field with the current gamestate
+   * @param three_stones_left A boolean which decides whether a player is able to jump with it's stones or not
+   * @return std::pair<Position, Position> The old position where the marker has been and the new position where it has been moved to
+   */
   std::pair<Position, Position> move_marker(Field& f, bool three_stones_left) override {
 
     while (true) {
@@ -109,6 +133,12 @@ public:
     }
   }
 
+  /**
+   * @brief Returns a boolean which says whether the player is a bot or not
+   *
+   * @return true if player is a bot
+   * @return false if player is a human player
+   */
   bool is_bot() override {
     return false;
   }
