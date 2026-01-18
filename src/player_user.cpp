@@ -42,6 +42,8 @@ public:
         f.player_set_stone(pos, marker);
         return pos;
 
+      } catch (const Helper::close_game&) {
+        throw;
       } catch (const std::exception& e) {
         std::cout << e.what() << std::endl;
       }
@@ -51,7 +53,7 @@ public:
   /**
    * @brief Remove one of the opponent's markers
    *
-   * @param f The gamegoard
+   * @param f The gameboard
    * @return Position of the removed marker
    */
   Position remove_opponent_marker(Field& f) override {
@@ -65,13 +67,17 @@ public:
 
         if (pos.is_valid()) {
 
-          std::vector<Position> removeable_stones = Mills::get_removeable_stones(f, opponent_marker);
-          if (!contains(removeable_stones, pos)) {
-            throw std::invalid_argument(error_msg::STONE_PART_OF_MILL);
+          std::vector<Position> removable_stones = Mills::get_removable_stones(f, opponent_marker);
+          if (!contains(removable_stones, pos)) {
+            if (f.get_field_marker_at_position(pos) == opponent_marker)
+              throw std::invalid_argument(error_msg::STONE_PART_OF_MILL);
+            throw std::invalid_argument(error_msg::INVALID_SELECTION);
           }
           f.player_remove_stone(pos, opponent_marker);
           return pos;
         }
+      } catch (const Helper::close_game&) {
+        throw;
       } catch (const std::exception& e) {
         std::cout << e.what() << std::endl;
       }
@@ -100,6 +106,8 @@ public:
         f.player_remove_stone(pos, marker);
         old_pos = &pos;
 
+      } catch (const Helper::close_game&) {
+        throw;
       } catch (const std::exception& e) {
         std::cout << "Error at moving stone: Failed to remove stone." << std::endl;
         std::cout << e.what() << std::endl;
@@ -120,6 +128,8 @@ public:
           return std::pair<Position, Position>(*old_pos, new_pos);
         }
         throw std::invalid_argument(error_msg::INVALID_SELECTION);
+      } catch (const Helper::close_game&) {
+        throw;
       } catch (const std::exception& e) {
         std::cout << "Error at moving stone: Failed to set stone." << std::endl;
         std::cout << e.what() << std::endl;

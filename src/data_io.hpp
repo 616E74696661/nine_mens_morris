@@ -23,21 +23,18 @@ public:
    * @param iteration counter to get the last active player
    */
   bool export_data(std::vector<std::string> field, int& gamemode, std::vector<User*>& players, int& iteration) {
-    // std::cout << "saving game... " << std::endl;
-
     // unimportant variable to check for directory
     struct stat sb;
     // if directory does not exist -> create the directory
     if (stat(dir.c_str(), &sb) != 0) {
+      // OS-dependant
 #if defined(_WIN32)
       int rc = mkdir(dir.c_str());
 #else
       int rc = mkdir(dir.c_str(), 0777);
 #endif
-      if (rc != 0) {
-        printf("AAAA\n");
+      if (rc != 0)
         return false; // directory not created}
-      }
     }
 
     std::ofstream file(dir + file_name, std::ios_base::trunc);
@@ -87,8 +84,6 @@ public:
    */
   bool
   import_data(Field& field, int& gamemode, std::vector<int>& stones_data, int& iteration) {
-    // std::cout << "loading game... " << std::endl;
-
     std::vector<std::string> field_vector;
     std::ifstream file(dir + file_name, std::ios_base::binary);
 

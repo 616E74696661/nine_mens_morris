@@ -70,6 +70,8 @@ public:
 
         std::cout << error_msg::INVALID_SELECTION << std::endl;
         std::cout << "--------------------------" << std::endl;
+      } catch (const Helper::close_game&) {
+        throw;
       } catch (std::exception) {
         std::cout << error_msg::INVALID_SELECTION << std::endl;
         std::cout << "--------------------------" << std::endl;

@@ -100,7 +100,7 @@ public:
   }
 
   /**
-   * @brief Abstract method to handle the placement of stones in the opening phase. To be implemented by inhereting classes
+   * @brief Abstract method to handle the placement of stones in the opening phase. To be implemented by inheriting classes
    *
    * @param f The field with the current gamestate
    * @return Position The position where the marker has been placed
@@ -108,7 +108,7 @@ public:
   virtual Position place_marker(Field& f) = 0;
 
   /**
-   * @brief Abstract method to handle the movement of stones in the middle and end phase. To be implemented by inhereting classes
+   * @brief Abstract method to handle the movement of stones in the middle and end phase. To be implemented by inheriting classes
    *
    * @param f The field with the current gamestate
    * @param three_stones_left A boolean which decides whether a player is able to jump with it's stones
@@ -117,7 +117,7 @@ public:
   virtual std::pair<Position, Position> move_marker(Field& f, bool three_stones_left) = 0;
 
   /**
-   * @brief Abstract method to handle the removing of an opponent's stone after successfully compleing a mill. To be implemented by inhereting classes
+   * @brief Abstract method to handle the removing of an opponent's stone after successfully completing a mill. To be implemented by inheriting classes
    *
    * @param f The field with the current gamestate
    * @return Position The position of the marker which has been removed

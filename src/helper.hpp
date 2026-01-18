@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <string>
 
+// OS-dependant
 #ifdef _WIN32
 const std::string clear_cmd = "cls";
 #else
@@ -13,7 +14,7 @@ const std::string clear_cmd = "clear";
 #endif
 
 namespace Helper {
-static const int ANIMATION_TIME = 10;
+static const int ANIMATION_TIME = 30;
 
 struct close_game : std::runtime_error {
   close_game() : std::runtime_error("close game") {}

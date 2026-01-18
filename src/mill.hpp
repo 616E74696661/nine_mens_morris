@@ -140,10 +140,10 @@ public:
    * @brief Get all removable stones of this marker
    *
    * @param field The gameboard
-   * @param marker The marker refering to the player's stones
+   * @param marker The marker referring to the player's stones
    * @return std::vector<Position>
    */
-  static std::vector<Position> get_removeable_stones(Field& field, char marker) {
+  static std::vector<Position> get_removable_stones(Field& field, char marker) {
 
     // Get positions of players stones
     std::vector<Position> players_stones = field.get_all_players_stones(marker);

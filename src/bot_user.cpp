@@ -45,8 +45,8 @@ private:
    * @return Position of the stone to move to the target position. If no stone was found, return invalid position
    */
   Position select_stone_to_fill_mill(Field& f, Position* target_pos, Mill* mill, bool jump_allowed) {
-
-    std::cout << "Jump allowed: " << jump_allowed << std::endl;
+    if (target_pos == nullptr || mill == nullptr)
+      return Position();
 
     if (jump_allowed) {
       // select stone which is not included within the potential mill
@@ -58,18 +58,17 @@ private:
     }
 
     // Search for adjacent stone to the target position
-    std::vector<Position*> adj_positions = target_pos->get_adjacent_positions();
+    std::vector<Position> adj_positions = target_pos->get_adjacent_positions();
     for (auto pos : adj_positions) {
-      if (!Mills::pos_is_part_of_mill(*pos, *mill) && f.get_field_marker_at_position(*pos) == marker) {
+      if (!Mills::pos_is_part_of_mill(pos, *mill) && f.get_field_marker_at_position(pos) == marker) {
         // Position is not part of the mill and occupied by this bot
-        return *pos;
+        return pos;
       }
     }
 
     // No stone found to block the marker -> select random to move random
     // Return values ändern -> erkennbar, ob mill geblockt werden kann
     // return invalid Position, False
-    std::cout << "Retuning invalid position" << std::endl;
     return Position();
   }
 
@@ -87,15 +86,14 @@ private:
     Mill target_mill = mill_and_pos.first;
     Position target_pos = mill_and_pos.second;
 
-    Position moveable_stone;
+    Position movable_stone;
 
     if (target_pos.is_valid()) {
-      std::cout << "Trying to complete own mill" << std::endl;
-      moveable_stone = select_stone_to_fill_mill(f, &target_pos, &target_mill, jump_allowed);
+      movable_stone = select_stone_to_fill_mill(f, &target_pos, &target_mill, jump_allowed);
 
-      if (moveable_stone.is_valid()) {
-        f.validate_coordinates(moveable_stone, marker);
-        return std::pair<Position, Position>(moveable_stone, target_pos);
+      if (movable_stone.is_valid()) {
+        f.validate_coordinates(movable_stone, marker);
+        return std::pair<Position, Position>(movable_stone, target_pos);
       }
     }
 
@@ -105,18 +103,16 @@ private:
     target_pos = mill_and_pos.second;
 
     if (target_pos.is_valid()) {
-      std::cout << "Trying to block opponent's mill" << std::endl;
-      moveable_stone = select_stone_to_fill_mill(f, &target_pos, &target_mill, jump_allowed);
-      if (moveable_stone.is_valid()) {
-        f.validate_coordinates(moveable_stone, marker);
-        return std::pair<Position, Position>(moveable_stone, target_pos);
+      movable_stone = select_stone_to_fill_mill(f, &target_pos, &target_mill, jump_allowed);
+      if (movable_stone.is_valid()) {
+        f.validate_coordinates(movable_stone, marker);
+        return std::pair<Position, Position>(movable_stone, target_pos);
       }
     }
 
     // No stone was found to either complete or prevent a mill
 
     // Random move
-    std::cout << "Random move" << std::endl;
     if (jump_allowed) {
       // return random stone to jump to an empty position
       Position old_pos = get_random_position(f, this->marker);
@@ -126,9 +122,9 @@ private:
       // Search for stone with empty neighbour
       std::vector<Position> own_stones = f.get_all_players_stones(marker);
       for (auto pos : own_stones) {
-        for (auto neighbour : pos.get_adjacent_positions()) {
-          if (f.get_field_marker_at_position(*neighbour) == f.EMPTY_FIELD) {
-            return std::pair<Position, Position>(pos, *neighbour);
+        for (auto& neighbour : pos.get_adjacent_positions()) {
+          if (f.get_field_marker_at_position(neighbour) == f.EMPTY_FIELD) {
+            return std::pair<Position, Position>(pos, neighbour);
           }
         }
       }
@@ -218,8 +214,8 @@ public:
   Position remove_opponent_marker(Field& f) override {
 
     // random opponent stone
-    std::vector<Position> removeable_stones = Mills::get_removeable_stones(f, opponent_marker);
-    Position removable_stone = get_random_position(f, opponent_marker, removeable_stones);
+    std::vector<Position> removable_stones = Mills::get_removable_stones(f, opponent_marker);
+    Position removable_stone = get_random_position(f, opponent_marker, removable_stones);
 
     // try to block opponent's potential mill
     try {
@@ -234,7 +230,7 @@ public:
             continue;
           }
 
-          if (contains(removeable_stones, pos)) {
+          if (contains(removable_stones, pos)) {
             removable_stone = pos;
             break;
           }

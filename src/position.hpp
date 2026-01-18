@@ -181,12 +181,8 @@ public:
     int pos1index = get_index(pos1.x, pos1.y);
     int pos2index = get_index(pos2.x, pos2.y);
     std::array<int, 4> arr = adjacency_neighbour.at(pos1index);
-    if (std::find(arr.begin(), arr.end(), pos2index) != arr.end()) {
-      printf("%i and %i are neighbours\n", pos1index, pos2index);
+    if (std::find(arr.begin(), arr.end(), pos2index) != arr.end())
       return true;
-    }
-
-    printf("%i and %i are NOT neighbours\n", pos1index, pos2index);
     return false;
   }
 
@@ -195,9 +191,9 @@ public:
    *
    * @return std::vector<Position*>
    */
-  std::vector<Position*> get_adjacent_positions() {
+  std::vector<Position> get_adjacent_positions() {
 
-    std::vector<Position*> neighbours;
+    std::vector<Position> neighbours;
 
     // Get adjacent indexes of position
     int pos_index = get_index(x, y);
@@ -208,7 +204,7 @@ public:
     for (auto index : neighbour_indexes) {
       if (index != -1) {
         pos_coord = valid_positions.at(index);
-        neighbours.push_back(new Position(pos_coord.first, pos_coord.second));
+        neighbours.push_back(Position(pos_coord.first, pos_coord.second));
       }
     }
     return neighbours;

@@ -46,7 +46,7 @@ public:
 
     for (auto& pos : stones) {
       for (auto& adj : pos.get_adjacent_positions()) {
-        if (get_field_marker_at_position(*adj) == EMPTY_FIELD) {
+        if (get_field_marker_at_position(adj) == EMPTY_FIELD) {
           return true;
         }
       }

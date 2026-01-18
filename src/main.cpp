@@ -41,6 +41,7 @@ int main() {
   }
 
   int iteration = 0;
+  bool saved = true;
   try {
     while (true) {
 
@@ -53,10 +54,11 @@ int main() {
       // switch active player
       active_user = players.at((++iteration) % 2);
 
-      data_io.export_data(f.get_field_template(), setting.mode, setting.players, iteration);
+      saved = data_io.export_data(f.get_field_template(), setting.mode, setting.players, iteration);
     }
   } catch (const Helper::close_game&) {
-    std::cout << "Game over!\n";
+    if (iteration > 0)
+      std::cout << "Saving " << (saved ? "succeeded" : "failed") << std::endl;
   }
 }
 
@@ -135,7 +137,6 @@ Position game() {
   }
   std::cout << ">>> Set: " << active_user->get_stones_set() << " Removed: " << active_user->get_stones_removed() << " Board: " << active_user->get_stones_on_board() << std::endl;
 
-  // Helper::clear_console();
   std::cout << output << std::endl;
 
   return new_pos;
