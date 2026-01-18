@@ -13,7 +13,7 @@
 class DataIO {
 
 public:
-  void export_data(std::vector<std::string> field, int& mode, std::vector<User*>& players, int& active_user) {
+  void export_data(std::vector<std::string> field, int& mode, std::vector<User*>& players, int& iteration) {
 
     std::cout << "saving game... " << std::endl;
     std::ofstream file(file_name, std::ios_base::trunc);
@@ -34,23 +34,24 @@ public:
     file.write(reinterpret_cast<char*>(&mode), sizeof(mode));
 
     // save players_data
-    std::vector<int> stones_data{players[0]->get_stones_removed(),
-                                 players[0]->get_stones_set(),
-                                 players[1]->get_stones_removed(),
-                                 players[1]->get_stones_set()};
+    std::vector<int> stones_data{players[0]->get_stones_set(),
+                                 players[0]->get_stones_removed(),
+                                 players[1]->get_stones_set(),
+                                 players[1]->get_stones_removed()};
+
     for (auto stone_data : stones_data) {
       file.write(reinterpret_cast<const char*>(&stone_data), sizeof(int));
     }
 
     // save active_user
-    file.write(reinterpret_cast<char*>(&active_user), sizeof(active_user));
+    file.write(reinterpret_cast<char*>(&iteration), sizeof(iteration));
 
     file.close();
 
     printf("succeeded :)\n\tfilename: %s\n", file_name.c_str());
   }
 
-  void import_data(Field& field, int& mode, std::vector<int>& stones_data, int& active_user) {
+  void import_data(Field& field, int& mode, std::vector<int>& stones_data, int& iteration) {
     std::vector<std::string> field_vector;
     std::cout << "loading game... " << std::endl;
     std::ifstream file(file_name, std::ios_base::binary);
@@ -71,18 +72,16 @@ public:
 
     // read mode
     file.read(reinterpret_cast<char*>(&mode), sizeof(mode));
-    // read players_data
 
-    stones_data.resize(4);
-    file.read(reinterpret_cast<char*>(stones_data.data()),
-              4 * sizeof(int));
-
-    stones_data.resize(4); // oder die feste Anzahl
-    for (size_t i = 0; i < stones_data.size(); ++i) {
-      file.read(reinterpret_cast<char*>(&stones_data[i]), sizeof(int));
+    // read stones_data
+    for (int i = 0; i < 4; i++) {
+      int stone_data;
+      file.read(reinterpret_cast<char*>(&stone_data),
+                sizeof(int));
+      stones_data.push_back(stone_data);
     }
-    // read active_user
-    file.read(reinterpret_cast<char*>(&active_user), sizeof(active_user));
+
+    file.read(reinterpret_cast<char*>(&iteration), sizeof(iteration));
 
     file.close();
 

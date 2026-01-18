@@ -24,13 +24,12 @@ Position pos;
 std::vector<User*> players;
 User* active_user = nullptr;
 int MAX_NUM_STONES = 9; // change to 9
-int iteration = 0;
+int iteration;
 
 int main() {
   init();
 
   while (true) {
-
     // handle a turn
     pos = game();
 
@@ -45,10 +44,10 @@ int main() {
 }
 
 void init() {
-  players = setting.setup(f);
+  players = setting.setup(f, iteration);
   if (players.empty())
     throw std::logic_error("No players");
-  active_user = players.at(0);
+  active_user = players.at((iteration) % 2);
   std::cout << game_text::WELCOME << std::endl;
 }
 

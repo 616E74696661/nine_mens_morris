@@ -21,7 +21,7 @@ public:
   int mode;
   std::vector<User*> players;
 
-  std::vector<User*> setup(Field& field) {
+  std::vector<User*> setup(Field& field, int& iteration) {
     std::string output;
     while (true) {
       try {
@@ -41,30 +41,17 @@ public:
           break;
         } else if (mode == 9) {
           DataIO data_io;
-
           int mode_data;
-          std::vector<int> stone_data;
-          int active_user;
-
-          data_io.import_data(field, mode_data, stone_data, active_user);
-
-          std::cout << "mode_data: " << mode_data << std::endl;
-
-          std::cout << "stone_data: " << std::endl;
-          for (auto stone_ : stone_data) {
-            std::cout << "\t" << stone_ << std::endl;
-          }
-
-          std::cout << "active_user: " << active_user << std::endl;
-
+          std::vector<int> stones_data;
+          data_io.import_data(field, mode_data, stones_data, iteration);
           switch (mode_data) {
           case PLAYER_VS_PLAYER:
-            players.push_back(new PlayerUser("Player 1", stone_data[0], stone_data[1]));
-            players.push_back(new PlayerUser("Player 2", stone_data[2], stone_data[3]));
+            players.push_back(new PlayerUser("Player 1", stones_data[0], stones_data[1]));
+            players.push_back(new PlayerUser("Player 2", stones_data[2], stones_data[3]));
             break;
           case PLAYER_VS_BOT:
-            players.push_back(new PlayerUser("Player 1", stone_data[0], stone_data[1]));
-            players.push_back(new BotUser("Bot", stone_data[2], stone_data[3]));
+            players.push_back(new PlayerUser("Player 1", stones_data[0], stones_data[1]));
+            players.push_back(new BotUser("Bot", stones_data[2], stones_data[3]));
             break;
           }
           break;
@@ -75,7 +62,7 @@ public:
         }
       } catch (std::exception) {
         std::cout << error_msg::INVALID_SELECTION << std::endl;
-        std::cout << "----------------------daaaaa----" << std::endl;
+        std::cout << "--------------------------" << std::endl;
       }
     }
     Helper::clear_console();
