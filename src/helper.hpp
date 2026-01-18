@@ -14,7 +14,7 @@ const std::string clear_cmd = "clear";
 #endif
 
 namespace Helper {
-static const int ANIMATION_TIME = 30;
+static const int ANIMATION_TIME = 50;
 
 struct close_game : std::runtime_error {
   close_game() : std::runtime_error("close game") {}
@@ -50,7 +50,8 @@ inline int read_uint(const std::string& prompt) {
  */
 inline void clear_console() {
   system(clear_cmd.c_str());
-  std::cout << std::endl;
+  std::cout << std::endl
+            << std::endl;
 }
 
 } // namespace Helper

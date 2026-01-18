@@ -73,7 +73,7 @@ public:
   }
 
   /**
-   * @brief Import .bin file to get latest gamestate
+   * @brief Import .bin file to get last saved game
    *
    * @param field
    * @param gamemode

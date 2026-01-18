@@ -103,7 +103,7 @@ Position game() {
   // check if user is a player
   if (!active_user->is_bot()) {
     f.field_output();
-    std::cout << "It's your turn, " << active_user->name << " (" << active_user->marker << ")" << std::endl;
+    std::cout << "\nIt's your turn, " << active_user->name << " (" << active_user->marker << ")" << std::endl;
   }
 
   std::string output;

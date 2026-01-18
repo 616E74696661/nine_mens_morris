@@ -13,7 +13,8 @@
 
 enum GameMode {
   PLAYER_VS_PLAYER = 1,
-  PLAYER_VS_BOT = 2
+  PLAYER_VS_BOT = 2,
+  LOAD_GAMESTATE = 3
 };
 
 class Settings {
@@ -28,15 +29,22 @@ public:
    */
   std::vector<User*> setup(Field& field, int& iteration) {
     std::string output;
+    bool load_attempted = false;
     while (true) {
       try {
+        if (!load_attempted) {
+          mode = Helper::read_uint(game_text::GAME_MODE);
+        } else {
+          // after failed load, don't allow option 9 anymore
+          mode = Helper::read_uint(game_text::GAME_MODE_NO_FILE);
+        }
 
-        mode = Helper::read_uint(game_text::GAME_MODE);
-
-        if (mode == 9) {
+        if (mode == LOAD_GAMESTATE && !load_attempted) {
+          load_attempted = true;
           DataIO data_io;
           int mode_data;
           std::vector<int> stones_data;
+
           if (data_io.import_data(field, mode_data, stones_data, iteration)) {
             output = "Loading game...\n";
             switch (mode_data) {
@@ -53,10 +61,12 @@ public:
             }
             break;
           }
+
           Helper::clear_console();
-          std::cout << "No Gamestate found." << std::endl;
-          mode = Helper::read_uint(game_text::GAME_MODE_NO_FILE);
+          std::cout << game_text::NO_FILE_FOUND << std::endl;
+          continue;
         }
+
         if (mode == PLAYER_VS_PLAYER) {
           output = game_text::PVP_SELECTED;
           players.push_back(new PlayerUser("Player 1"));
@@ -68,15 +78,14 @@ public:
           players.push_back(new PlayerUser("Player 1"));
           players.push_back(new BotUser("Bot"));
           break;
-        } else
-          break;
+        }
 
         std::cout << error_msg::INVALID_SELECTION << std::endl;
         std::cout << "--------------------------" << std::endl;
       } catch (const Helper::close_game&) {
         throw;
       } catch (std::exception) {
-        std::cout << error_msg::INVALID_SELECTION << std::endl;
+        std::cout << error_msg::INVALID_INPUT_TYPE << std::endl;
         std::cout << "--------------------------" << std::endl;
       }
     }
