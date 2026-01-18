@@ -109,7 +109,7 @@ private:
   }
 
 public:
-  BotUser(std::string name) : User(name) {}
+  BotUser(std::string name, int set = 0, int removed = 0) : User(name, set, removed) {}
 
   Position place_marker(Field& f) override {
 

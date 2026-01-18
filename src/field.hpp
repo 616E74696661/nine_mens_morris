@@ -12,9 +12,11 @@
 
 class Field {
 public:
-  Field() {
+  Field(std::vector<std::string> field_string = {}) {
     current_phase = OPENING;
     stones_set = 0;
+    if (field_string.empty())
+      field_template = field_string;
   }
 
   enum GamePhase {
@@ -143,6 +145,10 @@ public:
     return players_positions;
   }
 
+  std::vector<std::string>& get_field_template() {
+    return field_template;
+  }
+
 private:
   GamePhase current_phase;
   int stones_set;
@@ -150,7 +156,7 @@ private:
   static const int FIELD_WIDTH = 26;
   static const int FIELD_HEIGHT = 15;
 
-  char field_template[FIELD_HEIGHT][FIELD_WIDTH] = {
+  std::vector<std::string> field_template = { // oder so
       "#-----------#-----------#",
       "|           |           |",
       "|   #-------#-------#   |",

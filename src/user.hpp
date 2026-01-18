@@ -34,11 +34,11 @@ public:
   char opponent_marker;
   std::string name;
 
-  User(std::string name) : name(name) {
+  User(std::string name, int set = 0, int removed = 0) : name(name) {
     num_players++;
     define_marker();
-    stones_set = 0;
-    stones_removed = 0;
+    stones_set = set;
+    stones_removed = removed;
   }
 
   bool able_to_make_legal_move(Field& f);
