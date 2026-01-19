@@ -55,6 +55,9 @@ int main() {
       active_user = players.at((++iteration) % 2);
 
       saved = data_io.export_data(f.get_field_template(), setting.mode, setting.players, iteration);
+
+      Helper::clear_console();
+
     }
   } catch (const Helper::close_game&) {
     if (iteration > 0)
@@ -136,8 +139,6 @@ Position game() {
     throw std::range_error("FATAL ERROR. PLAYER PLAYED MORE THAN 9 STONES.");
   }
   std::cout << ">>> Set: " << active_user->get_stones_set() << " Removed: " << active_user->get_stones_removed() << " Board: " << active_user->get_stones_on_board() << std::endl;
-
-  Helper::clear_console();
 
   std::cout << output << std::endl;
 
