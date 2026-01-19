@@ -14,7 +14,7 @@ const std::string clear_cmd = "clear";
 #endif
 
 namespace Helper {
-static const int ANIMATION_TIME = 50;
+static const int ANIMATION_TIME = 15;
 
 struct close_game : std::runtime_error {
   close_game() : std::runtime_error("close game") {}
