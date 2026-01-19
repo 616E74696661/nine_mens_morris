@@ -5,7 +5,8 @@
 namespace game_text {
 static const std::string WELCOME =
     "\nWelcome to Nine Men's Morris!\n\n"
-    "GOAL:\tGet 3 stones in a row to remove an opponent's stone.\n"
+    "GOAL:\n"
+    "\tGet 3 stones in a row to remove an opponent's stone.\n"
     "\tWin by reducing opponent to 2 stones or blocking all moves.\n\n"
     "PHASES:\n"
     "\tOpening: Place your 9 stones on the board\n"
