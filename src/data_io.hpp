@@ -6,7 +6,6 @@
 #include <cstdio>
 #include <fstream>
 #include <iostream>
-#include <regex.h>
 #include <string>
 #include <sys/stat.h>
 #include <vector>
