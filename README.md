@@ -27,9 +27,9 @@
 source: https://nine-mens-morris.net/manual.html
 
 ## starting the game
-Run ```g++ src/main.cpp -o main.exe``` to compile the game
+Run ```g++ src/main.cpp -o src/main.exe``` to compile the game
 
-Run ```.\mainn.exe``` to start the game
+Run ```src/mainn.exe``` to start the game
 
 
 ## files overview
